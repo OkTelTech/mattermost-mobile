@@ -37,7 +37,7 @@ export const translateYConfig: WithTimingConfig = {
     easing: Easing.bezier(0.33, 0.01, 0, 1),
 };
 
-export function useGalleryControls(bottomInset = 0) {
+export function useGalleryControls() {
     const headerAndFooterHidden = useSharedValue(false);
 
     const headerStyles = useAnimatedStyle(() => ({
@@ -61,10 +61,10 @@ export function useGalleryControls(bottomInset = 0) {
             },
         ],
         position: 'absolute',
-        bottom: bottomInset,
+        bottom: 0,
         width: '100%',
         zIndex: 1,
-    }), [bottomInset]);
+    }));
 
     const hideHeaderAndFooter = useCallback((hidden?: boolean) => {
         'worklet';
@@ -80,7 +80,7 @@ export function useGalleryControls(bottomInset = 0) {
         }
 
         headerAndFooterHidden.value = hidden;
-    }, [headerAndFooterHidden]);
+    }, []);
 
     return {
         headerAndFooterHidden,

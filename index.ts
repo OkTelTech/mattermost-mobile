@@ -8,6 +8,12 @@ import ViewReactNativeStyleAttributes from 'react-native/Libraries/Components/Vi
 import 'react-native-gesture-handler';
 import {Navigation} from 'react-native-navigation';
 
+// Initialize Reactotron and debug utilities in development mode
+if (__DEV__) {
+    require('./app/utils/reactotron').default;
+    require('./app/utils/database_debug');
+}
+
 import {start} from './app/init/app';
 import setFontFamily from './app/utils/font_family';
 import {logInfo} from './app/utils/log';
@@ -25,8 +31,16 @@ TurboLogger.configure({
 });
 
 if (__DEV__) {
+    // Uncomment the next line to hide ALL yellow box warnings
+     LogBox.ignoreAllLogs(true);
+
     LogBox.ignoreLogs([
         'new NativeEventEmitter',
+        'Component RCTImageView re-registered',
+        'Component ViewManagerAdapter_ExpoImage re-registered',
+        'Component RNSVGImage re-registered',
+        'Unbalanced calls start/end',
+        'EXPO_OS is not defined',
     ]);
 
     // Ignore all notifications if running e2e

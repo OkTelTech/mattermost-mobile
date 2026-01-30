@@ -5,6 +5,7 @@ import {defineMessage} from 'react-intl';
 import {DeviceEventEmitter, Platform} from 'react-native';
 
 import {CollectNetworkMetrics} from '@assets/config.json';
+import {logApiToReactotron} from '@utils/reactotron_api';
 import {Events} from '@constants';
 import {setServerCredentials} from '@init/credentials';
 import NetworkPerformanceManager from '@managers/network_performance_manager';
@@ -430,6 +431,17 @@ export default class ClientTracking {
             const existingSharedPassword = this.requestHeaders[ClientConstants.HEADER_X_MATTERMOST_PREAUTH_SECRET];
             this.setClientCredentials(bearerToken, existingSharedPassword);
         }
+
+        // Log API request to Reactotron in development
+        logApiToReactotron(
+            method?.toUpperCase() || 'GET',
+            url,
+            response.code,
+            response.metrics?.latency || 0,
+            options.body,
+            response.data,
+            
+        );
 
         if (response.ok) {
             return returnDataOnly ? (response.data || {}) : response;

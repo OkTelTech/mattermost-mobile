@@ -4,6 +4,7 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {DeviceEventEmitter, type StyleProp, StyleSheet, View, type ViewStyle} from 'react-native';
 import Animated from 'react-native-reanimated';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
 import {Events} from '@constants';
 import {GALLERY_FOOTER_HEIGHT} from '@constants/gallery';
@@ -47,6 +48,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#000',
         borderTopColor: changeOpacity('#fff', 0.4),
         borderTopWidth: 1,
+        flex: 1,
         flexDirection: 'row',
         justifyContent: 'center',
         height: GALLERY_FOOTER_HEIGHT,
@@ -63,6 +65,9 @@ const Footer = ({
     const serverUrl = useServerUrl();
     const showActions = !hideActions && Boolean(item.id) && !item.id?.startsWith('uid');
     const [action, setAction] = useState<GalleryAction>('none');
+    const {bottom} = useSafeAreaInsets();
+
+    const bottomStyle = useMemo(() => ({height: bottom, backgroundColor: '#000'}), [bottom]);
 
     let overrideIconUrl;
     if (enablePostIconOverride && post?.props?.use_user_icon !== 'true' && post?.props?.override_icon_url) {
@@ -152,6 +157,7 @@ const Footer = ({
                 />
                 }
             </View>
+            <View style={bottomStyle}/>
         </Animated.View>
     );
 };

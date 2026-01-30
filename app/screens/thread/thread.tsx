@@ -2,26 +2,26 @@
 // See LICENSE.txt for license information.
 
 import {uniqueId} from 'lodash';
-import React, {useCallback, useEffect, useMemo, useState} from 'react';
-import {Platform, type LayoutChangeEvent, StyleSheet} from 'react-native';
-import {KeyboardProvider} from 'react-native-keyboard-controller';
+import React, {useCallback, useEffect, useState} from 'react';
+import {type LayoutChangeEvent, StyleSheet, View} from 'react-native';
 import {type Edge, SafeAreaView} from 'react-native-safe-area-context';
 
 import {storeLastViewedThreadIdAndServer, removeLastViewedThreadIdAndServer} from '@actions/app/global';
 import FloatingCallContainer from '@calls/components/floating_call_container';
 import FreezeScreen from '@components/freeze_screen';
+import PostDraft from '@components/post_draft';
 import RoundedHeaderContext from '@components/rounded_header_context';
+import ScheduledPostIndicator from '@components/scheduled_post_indicator';
 import {Screens} from '@constants';
+import {ExtraKeyboardProvider} from '@context/extra_keyboard';
 import useAndroidHardwareBackHandler from '@hooks/android_back_handler';
-import {useIsTablet} from '@hooks/device';
 import useDidUpdate from '@hooks/did_update';
-import {useIsScreenVisible} from '@hooks/use_screen_visibility';
 import SecurityManager from '@managers/security_manager';
 import {popTopScreen, setButtons} from '@screens/navigation';
 import EphemeralStore from '@store/ephemeral_store';
 import NavigationStore from '@store/navigation_store';
 
-import ThreadContent from './thread_content';
+import ThreadPostList from './thread_post_list';
 
 import type PostModel from '@typings/database/models/servers/post';
 import type {AvailableScreens} from '@typings/screens/navigation';
@@ -36,6 +36,8 @@ type ThreadProps = {
     rootPost?: PostModel;
     scheduledPostCount: number;
 };
+
+const edges: Edge[] = ['left', 'right'];
 
 const styles = StyleSheet.create({
     flex: {flex: 1},
@@ -52,20 +54,6 @@ const Thread = ({
     scheduledPostCount,
 }: ThreadProps) => {
     const [containerHeight, setContainerHeight] = useState(0);
-    const isVisible = useIsScreenVisible(componentId);
-    const isTablet = useIsTablet();
-    const [isEmojiSearchFocused, setIsEmojiSearchFocused] = useState(false);
-
-    // Remove bottom safe area when emoji search is focused to eliminate gap between emoji picker and keyboard
-    const safeAreaViewEdges: Edge[] = useMemo(() => {
-        if (isTablet) {
-            return ['left', 'right'];
-        }
-        if (isEmojiSearchFocused) {
-            return ['left', 'right'];
-        }
-        return ['left', 'right', 'bottom'];
-    }, [isTablet, isEmojiSearchFocused]);
 
     const close = useCallback(() => {
         popTopScreen(componentId);
@@ -108,7 +96,7 @@ const Thread = ({
             }
             setButtons(componentId, {rightButtons: []});
         };
-    }, [rootId, componentId, isCRTEnabled]);
+    }, [rootId]);
 
     useDidUpdate(() => {
         if (!rootPost) {
@@ -127,34 +115,37 @@ const Thread = ({
             <SafeAreaView
                 style={styles.flex}
                 mode='margin'
-                edges={safeAreaViewEdges}
+                edges={edges}
                 testID='thread.screen'
                 onLayout={onLayout}
                 nativeID={SecurityManager.getShieldScreenId(componentId)}
             >
                 <RoundedHeaderContext/>
                 {Boolean(rootPost) &&
-                (Platform.OS === 'ios' ? (
-                    <KeyboardProvider>
-                        <ThreadContent
-                            rootId={rootId}
+                <ExtraKeyboardProvider>
+                    <View style={styles.flex}>
+                        <ThreadPostList
+                            nativeID={rootId}
                             rootPost={rootPost!}
-                            scheduledPostCount={scheduledPostCount}
-                            containerHeight={containerHeight}
-                            enabled={isVisible}
-                            onEmojiSearchFocusChange={setIsEmojiSearchFocused}
                         />
-                    </KeyboardProvider>
-                ) : (
-                    <ThreadContent
+                    </View>
+                    <>
+                        {scheduledPostCount > 0 &&
+                            <ScheduledPostIndicator
+                                isThread={true}
+                                scheduledPostCount={scheduledPostCount}
+                            />
+                        }
+                    </>
+                    <PostDraft
+                        channelId={rootPost!.channelId}
                         rootId={rootId}
-                        rootPost={rootPost!}
-                        scheduledPostCount={scheduledPostCount}
+                        testID='thread.post_draft'
                         containerHeight={containerHeight}
-                        enabled={isVisible}
-                        onEmojiSearchFocusChange={setIsEmojiSearchFocused}
+                        isChannelScreen={false}
+                        location={Screens.THREAD}
                     />
-                ))
+                </ExtraKeyboardProvider>
                 }
                 {showFloatingCallContainer &&
                     <FloatingCallContainer

@@ -25,8 +25,8 @@ import {
     ThreadOptionsScreen,
     ThreadScreen,
 } from '@support/ui/screen';
-import {getRandomId, timeouts} from '@support/utils';
-import {expect, waitFor} from 'detox';
+import {getRandomId} from '@support/utils';
+import {expect} from 'detox';
 
 describe('Threads - Save and Unsave Thread', () => {
     const serverOneDisplayName = 'Server 1';
@@ -58,16 +58,10 @@ describe('Threads - Save and Unsave Thread', () => {
         const parentMessage = `Message ${getRandomId()}`;
         await ChannelScreen.open(channelsCategory, testChannel.name);
         await ChannelScreen.postMessage(parentMessage);
-        await ChannelScreen.dismissKeyboard();
-
         const {post: parentPost} = await Post.apiGetLastPostInChannel(siteOneUrl, testChannel.id);
-        const {postListPostItem} = ChannelScreen.getPostListPostItem(parentPost.id, parentMessage);
-        await waitFor(postListPostItem).toBeVisible().withTimeout(timeouts.FOUR_SEC);
-
         await ChannelScreen.openReplyThreadFor(parentPost.id, parentMessage);
         const replyMessage = `${parentMessage} reply`;
         await ThreadScreen.postMessage(replyMessage);
-        await ChannelScreen.dismissKeyboard();
         await ThreadScreen.back();
         await ChannelScreen.back();
         await GlobalThreadsScreen.open();
@@ -103,12 +97,10 @@ describe('Threads - Save and Unsave Thread', () => {
         const parentMessage = `Message ${getRandomId()}`;
         await ChannelScreen.open(channelsCategory, testChannel.name);
         await ChannelScreen.postMessage(parentMessage);
-        await ChannelScreen.dismissKeyboard();
         const {post: parentPost} = await Post.apiGetLastPostInChannel(siteOneUrl, testChannel.id);
         await ChannelScreen.openReplyThreadFor(parentPost.id, parentMessage);
         const replyMessage = `${parentMessage} reply`;
         await ThreadScreen.postMessage(replyMessage);
-        await ChannelScreen.dismissKeyboard();
         await ThreadScreen.back();
         await ChannelScreen.back();
         await GlobalThreadsScreen.open();

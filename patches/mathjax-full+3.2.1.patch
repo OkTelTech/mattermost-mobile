@@ -1,0 +1,20 @@
+diff --git a/node_modules/mathjax-full/js/components/version.js b/node_modules/mathjax-full/js/components/version.js
+index 39d9b29..9aabf36 100644
+--- a/node_modules/mathjax-full/js/components/version.js
++++ b/node_modules/mathjax-full/js/components/version.js
+@@ -1,12 +1,8 @@
+ "use strict";
+ Object.defineProperty(exports, "__esModule", { value: true });
+ exports.VERSION = void 0;
++// Patched for React Native - hardcoded version instead of eval('require')
+ exports.VERSION = (typeof PACKAGE_VERSION === 'undefined' ?
+-    (function () {
+-        var load = eval('require');
+-        var dirname = eval('__dirname');
+-        var path = load('path');
+-        return load(path.resolve(dirname, '..', '..', 'package.json')).version;
+-    })() :
++    '3.2.1' :
+     PACKAGE_VERSION);
+ //# sourceMappingURL=version.js.map
+\ No newline at end of file

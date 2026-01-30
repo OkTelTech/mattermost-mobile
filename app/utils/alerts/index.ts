@@ -27,11 +27,11 @@ export const messages = defineMessages({
     },
     not_secured_ios: {
         id: 'mobile.managed.not_secured.ios',
-        defaultMessage: 'This device must be secured with biometrics or passcode to use Mattermost.\n\nGo to Settings > Face ID & Passcode.',
+        defaultMessage: 'This device must be secured with biometrics or passcode to use Oktel.\n\nGo to Settings > Face ID & Passcode.',
     },
     not_secured_android: {
         id: 'mobile.managed.not_secured.android',
-        defaultMessage: 'This device must be secured with a screen lock to use Mattermost.',
+        defaultMessage: 'This device must be secured with a screen lock to use Oktel.',
     },
     blocked_by: {
         id: 'mobile.managed.blocked_by',
@@ -253,7 +253,7 @@ export const showDeviceNotTrustedAlert = async (server: string, siteName: string
 
     const translations = getTranslations(locale || DEFAULT_LOCALE);
     const buttons = await buildSecurityAlertOptions(server, translations);
-    const securedBy = siteName || serverSiteName || 'Mattermost';
+    const securedBy = siteName || serverSiteName || 'Oktel';
 
     Alert.alert(
         translations[messages.blocked_by.id].replace('{vendor}', securedBy),
@@ -278,7 +278,7 @@ export const showNotSecuredAlert = async (server: string, siteName: string | und
     }
 
     const translations = getTranslations(locale || DEFAULT_LOCALE);
-    const securedBy = siteName || serverSiteName || 'Mattermost';
+    const securedBy = siteName || serverSiteName || 'Oktel';
 
     if (Platform.OS === 'android') {
         buttons.push({
@@ -328,7 +328,7 @@ export const showBiometricFailureAlert = async (server: string, blurOnAuthentica
             Emm.removeBlurEffect();
         }
     }, retryCallback);
-    const securedBy = siteName || serverSiteName || 'Mattermost';
+    const securedBy = siteName || serverSiteName || 'Oktel';
 
     Alert.alert(
         translations[messages.blocked_by.id].replace('{vendor}', securedBy),

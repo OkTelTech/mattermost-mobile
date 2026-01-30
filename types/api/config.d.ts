@@ -126,7 +126,6 @@ interface ClientConfig {
     FeatureFlagPostPriority?: string;
     FeatureFlagChannelBookmarks?: string;
     FeatureFlagCustomProfileAttributes?: string;
-    FeatureFlagInteractiveDialogAppsForm?: string;
     ForgotPasswordLink?: string;
     GfycatApiKey: string;
     GfycatApiSecret: string;
@@ -212,7 +211,6 @@ interface ClientConfig {
     WebsocketPort: string;
     WebsocketSecurePort: string;
     WebsocketURL: string;
-    BurnOnReadDurationSeconds: string;
 }
 
 type SecurityClientConfig = Pick<ClientConfig, 'MobileEnableBiometrics' | 'MobileJailbreakProtection' | 'MobilePreventScreenCapture' | 'SiteName'>

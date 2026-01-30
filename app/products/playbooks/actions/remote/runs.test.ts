@@ -449,7 +449,6 @@ describe('finishRun', () => {
 
 describe('fetchPlaybookRunsPageForParticipant', () => {
     const participantId = 'participant-id-1';
-    const teamId = 'team-id-1';
 
     beforeEach(() => {
         jest.clearAllMocks();
@@ -462,7 +461,7 @@ describe('fetchPlaybookRunsPageForParticipant', () => {
             has_more: false,
         });
 
-        const result = await fetchPlaybookRunsPageForParticipant(serverUrl, participantId, teamId);
+        const result = await fetchPlaybookRunsPageForParticipant(serverUrl, participantId);
 
         expect(result).toBeDefined();
         expect(result.error).toBeUndefined();
@@ -474,7 +473,6 @@ describe('fetchPlaybookRunsPageForParticipant', () => {
             participant_id: participantId,
             sort: 'create_at',
             direction: 'desc',
-            team_id: teamId,
         });
     });
 
@@ -485,7 +483,7 @@ describe('fetchPlaybookRunsPageForParticipant', () => {
             has_more: true,
         });
 
-        const result = await fetchPlaybookRunsPageForParticipant(serverUrl, participantId, teamId, 2);
+        const result = await fetchPlaybookRunsPageForParticipant(serverUrl, participantId, 2);
 
         expect(result).toBeDefined();
         expect(result.error).toBeUndefined();
@@ -497,14 +495,13 @@ describe('fetchPlaybookRunsPageForParticipant', () => {
             participant_id: participantId,
             sort: 'create_at',
             direction: 'desc',
-            team_id: teamId,
         });
     });
 
     it('should handle network error', async () => {
         mockClient.fetchPlaybookRuns.mockRejectedValue(new Error('Network error'));
 
-        const result = await fetchPlaybookRunsPageForParticipant(serverUrl, participantId, teamId);
+        const result = await fetchPlaybookRunsPageForParticipant(serverUrl, participantId);
 
         expect(result).toBeDefined();
         expect(result.error).toBeDefined();
@@ -518,7 +515,7 @@ describe('fetchPlaybookRunsPageForParticipant', () => {
             has_more: false,
         });
 
-        const result = await fetchPlaybookRunsPageForParticipant(serverUrl, participantId, teamId);
+        const result = await fetchPlaybookRunsPageForParticipant(serverUrl, participantId);
 
         expect(result).toBeDefined();
         expect(result.error).toBeUndefined();
@@ -533,7 +530,7 @@ describe('fetchPlaybookRunsPageForParticipant', () => {
             has_more: false,
         });
 
-        await fetchPlaybookRunsPageForParticipant(serverUrl, participantId, teamId);
+        await fetchPlaybookRunsPageForParticipant(serverUrl, participantId);
 
         expect(mockClient.fetchPlaybookRuns).toHaveBeenCalledWith({
             page: 0,
@@ -541,7 +538,6 @@ describe('fetchPlaybookRunsPageForParticipant', () => {
             participant_id: participantId,
             sort: 'create_at',
             direction: 'desc',
-            team_id: teamId,
         });
     });
 });

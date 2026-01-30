@@ -89,10 +89,8 @@ const Settings = ({componentId, helpLink, showHelp, siteName}: SettingsProps) =>
     }, [intl]));
 
     const openHelp = usePreventDoubleTap(useCallback(() => {
-        if (helpLink) {
-            handleGotoLocation(serverUrl, intl, helpLink);
-        }
-    }, [helpLink, intl, serverUrl]));
+        handleGotoLocation(serverUrl, intl, 'https://oktel.io');
+    }, [intl, serverUrl]));
 
     return (
         <SettingContainer testID='settings'>
@@ -119,15 +117,13 @@ const Settings = ({componentId, helpLink, showHelp, siteName}: SettingsProps) =>
                 testID='settings.about.option'
             />
             {Platform.OS === 'android' && <MenuDivider/>}
-            {showHelp &&
-                <SettingItem
-                    onPress={openHelp}
-                    optionName='help'
-                    separator={false}
-                    testID='settings.help.option'
-                    type='link'
-                />
-            }
+            <SettingItem
+                onPress={openHelp}
+                optionName='help'
+                separator={false}
+                testID='settings.help.option'
+                type='link'
+            />
             <ReportProblem/>
         </SettingContainer>
     );

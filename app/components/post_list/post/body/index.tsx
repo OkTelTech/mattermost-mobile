@@ -2,13 +2,11 @@
 // See LICENSE.txt for license information.
 
 import React, {useCallback, useMemo, useState} from 'react';
-import {useIntl} from 'react-intl';
 import {type LayoutChangeEvent, type StyleProp, View, type ViewStyle} from 'react-native';
 
 import Files from '@components/files';
 import FormattedText from '@components/formatted_text';
 import JumboEmoji from '@components/jumbo_emoji';
-import ErrorBoundary from '@components/markdown/error_boundary';
 import {Screens} from '@constants';
 import {THREAD} from '@constants/screens';
 import StatusUpdatePost from '@playbooks/components/status_update_post';
@@ -93,7 +91,6 @@ const Body = ({
     isCRTEnabled, isEphemeral, isFirstReply, isJumboEmoji, isLastReply, isPendingOrFailed, isPostAcknowledgementEnabled, isPostAddChannelMember,
     location, post, searchPatterns, showAddReaction, theme,
 }: BodyProps) => {
-    const intl = useIntl();
     const style = getStyleSheet(theme);
     const isEdited = postEdited(post);
     const isFailed = isPostFailed(post);
@@ -232,24 +229,19 @@ const Body = ({
     }
 
     return (
-        <ErrorBoundary
-            error={intl.formatMessage({id: 'post.error', defaultMessage: 'There has been an error rendering this post.'})}
-            theme={theme}
+        <View
+            style={style.messageContainerWithReplyBar}
+            onLayout={onLayout}
         >
-            <View
-                style={style.messageContainerWithReplyBar}
-                onLayout={onLayout}
-            >
-                <View style={replyBarStyle}/>
-                {body}
-                {isFailed &&
-                <Failed
-                    post={post}
-                    theme={theme}
-                />
-                }
-            </View>
-        </ErrorBoundary>
+            <View style={replyBarStyle}/>
+            {body}
+            {isFailed &&
+            <Failed
+                post={post}
+                theme={theme}
+            />
+            }
+        </View>
     );
 };
 

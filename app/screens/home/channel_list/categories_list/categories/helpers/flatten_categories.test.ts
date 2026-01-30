@@ -45,7 +45,6 @@ describe('flatten_categories utils', () => {
             const item: FlattenedItem = {
                 type: 'channel',
                 categoryId: 'cat1',
-                categoryType: 'custom',
                 channelId: 'channel1',
                 channel: mockChannel1,
             };
@@ -72,7 +71,6 @@ describe('flatten_categories utils', () => {
             const item: FlattenedItem = {
                 type: 'channel',
                 categoryId: 'cat1',
-                categoryType: 'custom',
                 channelId: 'channel1',
                 channel: mockChannel1,
             };

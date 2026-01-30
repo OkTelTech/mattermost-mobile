@@ -1,4 +1,4 @@
-// Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
+// Copyright (c) 2015-present Oktel, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -9,8 +9,8 @@ import {logError} from '@utils/log';
 
 const channelConfig = {
     id: 'calls_channel',
-    name: 'Mattermost',
-    description: 'Mattermost Calls microphone while app is in the background',
+    name: 'Oktel',
+    description: 'Oktel Calls microphone while app is in the background',
     enableVibration: false,
 };
 
@@ -23,8 +23,8 @@ export const foregroundServiceStart = async () => {
     const notificationConfig = {
         channelId: 'calls_channel',
         id: 345678,
-        title: 'Mattermost',
-        text: 'Mattermost Calls Microphone',
+        title: 'Oktel',
+        text: 'Oktel Calls Microphone',
         icon: '',
         button: 'Stop',
     };

@@ -1,36 +1,36 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import {defineMessages, type IntlShape} from 'react-intl';
-import {Alert, DeviceEventEmitter, type AlertButton} from 'react-native';
+import { defineMessages, type IntlShape } from 'react-intl';
+import { Alert, DeviceEventEmitter, type AlertButton } from 'react-native';
 
-import {cancelSessionNotification, findSession} from '@actions/local/session';
-import {doPing} from '@actions/remote/general';
-import {Database, Events} from '@constants';
-import {SYSTEM_IDENTIFIERS} from '@constants/database';
+import { cancelSessionNotification, findSession } from '@actions/local/session';
+import { doPing } from '@actions/remote/general';
+import { Database, Events } from '@constants';
+import { SYSTEM_IDENTIFIERS } from '@constants/database';
 import DatabaseManager from '@database/manager';
 import IntuneManager from '@managers/intune_manager';
 import NetworkManager from '@managers/network_manager';
 import WebsocketManager from '@managers/websocket_manager';
-import {getDeviceToken} from '@queries/app/global';
-import {getServerDisplayName} from '@queries/app/servers';
-import {getCurrentUserId} from '@queries/servers/system';
-import {getCurrentUser} from '@queries/servers/user';
-import {resetToHome} from '@screens/navigation';
+import { getDeviceToken } from '@queries/app/global';
+import { getServerDisplayName } from '@queries/app/servers';
+import { getCurrentUserId } from '@queries/servers/system';
+import { getCurrentUser } from '@queries/servers/user';
+import { resetToHome } from '@screens/navigation';
 import EphemeralStore from '@store/ephemeral_store';
-import {getFullErrorMessage, isErrorWithStatusCode, isErrorWithUrl} from '@utils/errors';
-import {getIntlShape} from '@utils/general';
-import {logWarning, logError, logDebug} from '@utils/log';
-import {scheduleExpiredNotification} from '@utils/notification';
-import {canReceiveNotifications} from '@utils/push_proxy';
-import {type SAMLChallenge} from '@utils/saml_challenge';
-import {getCSRFFromCookie} from '@utils/security';
-import {getServerUrlAfterRedirect} from '@utils/url';
+import { getFullErrorMessage, isErrorWithStatusCode, isErrorWithUrl } from '@utils/errors';
+import { getIntlShape } from '@utils/general';
+import { logWarning, logError, logDebug } from '@utils/log';
+import { scheduleExpiredNotification } from '@utils/notification';
+import { canReceiveNotifications } from '@utils/push_proxy';
+import { type SAMLChallenge } from '@utils/saml_challenge';
+import { getCSRFFromCookie } from '@utils/security';
+import { getServerUrlAfterRedirect } from '@utils/url';
 
-import {loginEntry} from './entry';
+import { loginEntry } from './entry';
 
-import type {Client} from '@client/rest';
-import type {LoginArgs} from '@typings/database/database';
+import type { Client } from '@client/rest';
+import type { LoginArgs } from '@typings/database/database';
 
 const HTTP_UNAUTHORIZED = 401;
 
@@ -63,40 +63,40 @@ const logoutMessages = defineMessages({
 
 export const addPushProxyVerificationStateFromLogin = async (serverUrl: string) => {
     try {
-        const {operator} = DatabaseManager.getServerDatabaseAndOperator(serverUrl);
+        const { operator } = DatabaseManager.getServerDatabaseAndOperator(serverUrl);
 
         const systems: IdValue[] = [];
 
         // Set push proxy verification
         const ppVerification = EphemeralStore.getPushProxyVerificationState(serverUrl);
         if (ppVerification) {
-            systems.push({id: SYSTEM_IDENTIFIERS.PUSH_VERIFICATION_STATUS, value: ppVerification});
+            systems.push({ id: SYSTEM_IDENTIFIERS.PUSH_VERIFICATION_STATUS, value: ppVerification });
         }
 
         if (systems.length) {
-            await operator.handleSystem({systems, prepareRecordsOnly: false});
+            await operator.handleSystem({ systems, prepareRecordsOnly: false });
         }
 
         return {};
     } catch (error) {
         logDebug('error setting the push proxy verification state on login', error);
-        return {error};
+        return { error };
     }
 };
 export const forceLogoutIfNecessary = async (serverUrl: string, err: unknown) => {
     const database = DatabaseManager.serverDatabases[serverUrl]?.database;
     if (!database) {
-        return {error: `${serverUrl} database not found`, logout: false};
+        return { error: `${serverUrl} database not found`, logout: false };
     }
 
     const currentUserId = await getCurrentUserId(database);
 
     if (isErrorWithStatusCode(err) && err.status_code === HTTP_UNAUTHORIZED && isErrorWithUrl(err) && err.url?.indexOf('/login') === -1 && currentUserId) {
-        await logout(serverUrl, undefined, {skipServerLogout: true});
-        return {error: null, logout: true};
+        await logout(serverUrl, undefined, { skipServerLogout: true });
+        return { error: null, logout: true };
     }
 
-    return {error: null, logout: false};
+    return { error: null, logout: false };
 };
 
 export const fetchSessions = async (serverUrl: string, currentUserId: string) => {
@@ -117,13 +117,14 @@ export const fetchSessions = async (serverUrl: string, currentUserId: string) =>
     return undefined;
 };
 
-export const login = async (serverUrl: string, {ldapOnly = false, loginId, mfaToken, password, config, serverDisplayName}: LoginArgs): Promise<LoginActionResponse> => {
+export const login = async (serverUrl: string, { ldapOnly = false, loginId, mfaToken, password, config, serverDisplayName }: LoginArgs): Promise<LoginActionResponse> => {
+
     let deviceToken;
     let user: UserProfile;
 
     const appDatabase = DatabaseManager.appDatabase?.database;
     if (!appDatabase) {
-        return {error: 'App database not found.', failed: true};
+        return { error: 'App database not found.', failed: true };
     }
 
     try {
@@ -146,7 +147,7 @@ export const login = async (serverUrl: string, {ldapOnly = false, loginId, mfaTo
             },
         });
 
-        await server?.operator.handleUsers({users: [user], prepareRecordsOnly: false});
+        await server?.operator.handleUsers({ users: [user], prepareRecordsOnly: false });
         await server?.operator.handleSystem({
             systems: [{
                 id: Database.SYSTEM_IDENTIFIERS.CURRENT_USER_ID,
@@ -158,16 +159,16 @@ export const login = async (serverUrl: string, {ldapOnly = false, loginId, mfaTo
         client.setCSRFToken(csrfToken);
     } catch (error) {
         logDebug('error on login', getFullErrorMessage(error));
-        return {error, failed: true};
+        return { error, failed: true };
     }
 
     try {
         await addPushProxyVerificationStateFromLogin(serverUrl);
-        const {error} = await loginEntry({serverUrl});
+        const { error } = await loginEntry({ serverUrl });
         await DatabaseManager.setActiveServerDatabase(serverUrl);
-        return {error, failed: false};
+        return { error, failed: false };
     } catch (error) {
-        return {error, failed: false};
+        return { error, failed: false };
     }
 };
 
@@ -211,11 +212,11 @@ export const logout = async (
             const cancel = intl?.formatMessage(logoutMessages.cancel) || logoutMessages.cancel.defaultMessage;
             const confirm = intl?.formatMessage(confirmMessage) || confirmMessage.defaultMessage;
 
-            const buttons: AlertButton[] = logoutOnAlert ? [] : [{text: cancel, style: 'cancel'}];
+            const buttons: AlertButton[] = logoutOnAlert ? [] : [{ text: cancel, style: 'cancel' }];
             buttons.push({
                 text: confirm,
                 onPress: logoutOnAlert ? undefined : () => {
-                    logout(serverUrl, intl, {skipEvents, removeServer, logoutOnAlert, skipServerLogout: true});
+                    logout(serverUrl, intl, { skipEvents, removeServer, logoutOnAlert, skipServerLogout: true });
                 },
             });
             Alert.alert(
@@ -225,22 +226,22 @@ export const logout = async (
             );
 
             if (!logoutOnAlert) {
-                return {data: false};
+                return { data: false };
             }
         }
     }
 
     WebsocketManager.getClient(serverUrl)?.close(true);
     if (!skipEvents) {
-        DeviceEventEmitter.emit(Events.SERVER_LOGOUT, {serverUrl, removeServer});
+        DeviceEventEmitter.emit(Events.SERVER_LOGOUT, { serverUrl, removeServer });
     }
 
-    return {data: true};
+    return { data: true };
 };
 
 export const scheduleSessionNotification = async (serverUrl: string) => {
     try {
-        const {database, operator} = DatabaseManager.getServerDatabaseAndOperator(serverUrl);
+        const { database, operator } = DatabaseManager.getServerDatabaseAndOperator(serverUrl);
         const sessions = await fetchSessions(serverUrl, 'me');
         const user = await getCurrentUser(database);
         const serverName = await getServerDisplayName(serverUrl);
@@ -270,7 +271,7 @@ export const scheduleSessionNotification = async (serverUrl: string) => {
     } catch (e) {
         logError('scheduleExpiredNotification', e);
         await forceLogoutIfNecessary(serverUrl, e);
-        return {error: e};
+        return { error: e };
     }
 };
 
@@ -278,17 +279,17 @@ export const sendPasswordResetEmail = async (serverUrl: string, email: string) =
     try {
         const client = NetworkManager.getClient(serverUrl);
         const response = await client.sendPasswordResetEmail(email);
-        return {status: response.status};
+        return { status: response.status };
     } catch (error) {
         logDebug('error on sendPasswordResetEmail', getFullErrorMessage(error));
-        return {error};
+        return { error };
     }
 };
 
 const completeSSOLogin = async (serverUrl: string, serverDisplayName: string, serverIdentifier: string, client: Client, userData?: UserProfile, skipChecks = false): Promise<LoginActionResponse> => {
     const database = DatabaseManager.appDatabase?.database;
     if (!database) {
-        return {error: 'App database not found', failed: true};
+        return { error: 'App database not found', failed: true };
     }
 
     try {
@@ -304,7 +305,7 @@ const completeSSOLogin = async (serverUrl: string, serverDisplayName: string, se
 
         const user = userData || await client.getMe();
 
-        await server?.operator.handleUsers({users: [user], prepareRecordsOnly: false});
+        await server?.operator.handleUsers({ users: [user], prepareRecordsOnly: false });
         await server?.operator.handleSystem({
             systems: [{
                 id: Database.SYSTEM_IDENTIFIERS.CURRENT_USER_ID,
@@ -314,20 +315,20 @@ const completeSSOLogin = async (serverUrl: string, serverDisplayName: string, se
         });
     } catch (error) {
         logDebug('error on ssoLogin', getFullErrorMessage(error));
-        return {error, failed: true};
+        return { error, failed: true };
     }
 
     try {
         await addPushProxyVerificationStateFromLogin(serverUrl);
-        const {error} = await loginEntry({serverUrl});
+        const { error } = await loginEntry({ serverUrl });
         await DatabaseManager.setActiveServerDatabase(serverUrl, {
             skipMAMEnrollmentCheck: skipChecks,
             skipJailbreakCheck: skipChecks,
             skipBiometricCheck: skipChecks,
         });
-        return {error, failed: false};
+        return { error, failed: false };
     } catch (error) {
-        return {error, failed: false};
+        return { error, failed: false };
     }
 };
 
@@ -343,7 +344,7 @@ export const ssoLogin = async (serverUrl: string, serverDisplayName: string, ser
 
 export const ssoLoginWithCodeExchange = async (serverUrl: string, serverDisplayName: string, serverIdentifier: string, loginCode: string, samlChallenge: Pick<SAMLChallenge, 'codeVerifier' | 'state'>, preauthSecret?: string): Promise<LoginActionResponse> => {
     const client = NetworkManager.getClient(serverUrl);
-    const {token, csrf} = await client.exchangeSsoLoginCode(loginCode, samlChallenge.codeVerifier, samlChallenge.state);
+    const { token, csrf } = await client.exchangeSsoLoginCode(loginCode, samlChallenge.codeVerifier, samlChallenge.state);
 
     client.setClientCredentials(token, preauthSecret);
     client.setCSRFToken(csrf);
@@ -356,7 +357,7 @@ export const nativeEntraLogin = async (serverUrl: string, serverDisplayName: str
     try {
         // Step 1: Acquire MSAL tokens with IntuneScope
         const tokens = await IntuneManager.login(serverUrl, [intuneScope]);
-        const {accessToken, identity} = tokens;
+        const { accessToken, identity } = tokens;
 
         // Step 2: POST accessToken to /oauth/intune to exchange for session token
         const client = NetworkManager.getClient(serverUrl);
@@ -411,7 +412,7 @@ export const nativeEntraLogin = async (serverUrl: string, serverDisplayName: str
         return result;
     } catch (error) {
         logError('nativeEntraLogin failed', error);
-        return {error, failed: true};
+        return { error, failed: true };
     }
 };
 
@@ -421,7 +422,7 @@ export const getUserLoginType = async (serverUrl: string, loginId: string) => {
         return await client.getUserLoginType(loginId);
     } catch (error) {
         logError('error on getUserLoginType', getFullErrorMessage(error));
-        return {error};
+        return { error };
     }
 };
 
@@ -432,7 +433,7 @@ export const magicLinkLogin = async (serverUrl: string, token: string): Promise<
         // Retry with HTTP
         const httpHeadRequest = await getServerUrlAfterRedirect(serverUrl, true);
         if (httpHeadRequest.error || !httpHeadRequest.url) {
-            return {error: httpsHeadRequest.error || httpHeadRequest.error || 'empty server url', failed: true};
+            return { error: httpsHeadRequest.error || httpHeadRequest.error || 'empty server url', failed: true };
         }
         serverUrlToUse = httpHeadRequest.url;
     } else {
@@ -441,7 +442,7 @@ export const magicLinkLogin = async (serverUrl: string, token: string): Promise<
 
     const database = DatabaseManager.appDatabase?.database;
     if (!database) {
-        return {error: 'App database not found', failed: true};
+        return { error: 'App database not found', failed: true };
     }
 
     try {
@@ -461,7 +462,7 @@ export const magicLinkLogin = async (serverUrl: string, token: string): Promise<
             },
         });
 
-        await server?.operator.handleUsers({users: [user], prepareRecordsOnly: false});
+        await server?.operator.handleUsers({ users: [user], prepareRecordsOnly: false });
         await server?.operator.handleSystem({
             systems: [{
                 id: Database.SYSTEM_IDENTIFIERS.CURRENT_USER_ID,
@@ -485,16 +486,16 @@ export const magicLinkLogin = async (serverUrl: string, token: string): Promise<
             await canReceiveNotifications(serverUrlToUse, pingResult.canReceiveNotifications as string, intl);
         }
     } catch (error) {
-        return {error, failed: true};
+        return { error, failed: true };
     }
 
     try {
         await addPushProxyVerificationStateFromLogin(serverUrlToUse);
-        const {error} = await loginEntry({serverUrl: serverUrlToUse});
+        const { error } = await loginEntry({ serverUrl: serverUrlToUse });
         await DatabaseManager.setActiveServerDatabase(serverUrlToUse);
         await resetToHome();
-        return {error, failed: false};
+        return { error, failed: false };
     } catch (error) {
-        return {error, failed: false};
+        return { error, failed: false };
     }
 };

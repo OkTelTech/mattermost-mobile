@@ -11,6 +11,7 @@ import {getConfigValue} from '@queries/servers/system';
 import {hasReliableWebsocket} from '@utils/config';
 import {toMilliseconds} from '@utils/datetime';
 import {logDebug, logError, logInfo, logWarning} from '@utils/log';
+import {logWebSocketEvent} from '@utils/reactotron';
 
 const MAX_WEBSOCKET_FAILS = 7;
 const WEBSOCKET_TIMEOUT = toMilliseconds({seconds: 30});
@@ -126,6 +127,8 @@ export default class WebSocketClient {
 
         if (this.connectFailCount === 0) {
             logInfo('websocket connecting to ' + this.url);
+            logWebSocketEvent('CONNECTING', {url: this.url});
+            console.log('[WS DEBUG] Connecting to:', this.url);
         }
 
         this.shouldSkipSync = shouldSkipSync;
@@ -179,9 +182,13 @@ export default class WebSocketClient {
 
             if (this.shouldSkipSync) {
                 logInfo('websocket connected to', this.url);
+                logWebSocketEvent('CONNECTED', {url: this.url, firstConnect: true});
+                console.log('[WS DEBUG] Connected (first):', this.url);
                 this.firstConnectCallback?.();
             } else {
                 logInfo('websocket re-established connection to', this.url);
+                logWebSocketEvent('RECONNECTED', {url: this.url});
+                console.log('[WS DEBUG] Reconnected:', this.url);
                 if (!reliableWebSockets && this.reconnectCallback) {
                     this.reconnectCallback();
                 } else if (reliableWebSockets) {
@@ -239,6 +246,8 @@ export default class WebSocketClient {
 
             if (this.connectFailCount === 0) {
                 logInfo('websocket closed', this.url);
+                logWebSocketEvent('CLOSED', {url: this.url});
+                console.log('[WS DEBUG] Closed:', this.url);
             }
 
             this.connectFailCount++;
@@ -275,6 +284,8 @@ export default class WebSocketClient {
                 if (this.connectFailCount <= 1) {
                     logError('websocket error', this.url);
                     logError('WEBSOCKET ERROR EVENT', evt);
+                    logWebSocketEvent('ERROR', {url: this.url, error: evt});
+                    console.log('[WS ERROR]', this.url, evt);
                 }
 
                 if (this.errorCallback) {
@@ -338,6 +349,8 @@ export default class WebSocketClient {
                 }
 
                 this.serverSequence = msg.seq + 1;
+                logWebSocketEvent(msg.event || 'MESSAGE', {seq: msg.seq, data: msg.data, broadcast: msg.broadcast});
+                console.log('[WS EVENT]', msg.event, JSON.stringify(msg, null, 2));
                 this.eventCallback(msg);
             }
         });

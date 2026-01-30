@@ -178,7 +178,6 @@ const observeFlattenedUnreads = (
                 map((channel) => ({
                     type: 'channel',
                     categoryId: UNREADS_CATEGORY,
-                    categoryType: UNREADS_CATEGORY,
                     channelId: channel.id,
                     channel,
                 }));

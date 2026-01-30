@@ -71,13 +71,13 @@
           <action android:name="android.intent.action.VIEW" />
           <category android:name="android.intent.category.DEFAULT" />
           <category android:name="android.intent.category.BROWSABLE" />
-          <data android:scheme="mattermost" />
+          <data android:scheme="oktel" />
         </intent-filter>
         <intent-filter>
           <action android:name="android.intent.action.VIEW" />
           <category android:name="android.intent.category.DEFAULT" />
           <category android:name="android.intent.category.BROWSABLE" />
-          <data android:scheme="mmauthbeta" />
+          <data android:scheme="oktelauth" />
         </intent-filter>
       </activity>
       <service android:name=".NotificationDismissService"
@@ -97,7 +97,7 @@
         android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize|uiMode"
         android:windowSoftInputMode="adjustResize"
         android:theme="@style/AppTheme"
-        android:taskAffinity="com.mattermost.share"
+        android:taskAffinity="com.ok.tel.share"
         android:exported="true"
       >
           <intent-filter>

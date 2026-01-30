@@ -1,6 +1,13 @@
 #!/bin/sh
 
-[[ -s $HOME/.nvm/nvm.sh ]] && . $HOME/.nvm/nvm.sh
+# Load nvm if available
+export NVM_DIR="$HOME/.nvm"
+[[ -s "$NVM_DIR/nvm.sh" ]] && . "$NVM_DIR/nvm.sh"
+
+# Ensure node is in PATH (fallback to common locations)
+if ! command -v node &> /dev/null; then
+  export PATH="$HOME/.nvm/versions/node/v22.17.0/bin:$PATH"
+fi
 
 export NODE_OPTIONS=--max_old_space_size=12000
 export BUNDLE_COMMAND="bundle"

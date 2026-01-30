@@ -37,7 +37,7 @@ type LearnMoreProps = {
 const messages = defineMessages({
     teamEditionLearn: {
         id: 'about.teamEditionLearn',
-        defaultMessage: 'Join the Mattermost community at',
+        defaultMessage: 'Join the Oktel community at',
     },
     enterpriseEditionLearn: {
         id: 'about.enterpriseEditionLearn',

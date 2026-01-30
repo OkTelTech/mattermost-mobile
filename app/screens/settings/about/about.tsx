@@ -206,12 +206,12 @@ const About = ({componentId, config, license}: AboutProps) => {
     return (
         <SettingContainer testID='about'>
             <View style={styles.logoContainer}>
-                <CompassIcon
+                {/* <CompassIcon
                     color={theme.centerChannelColor}
                     name='mattermost'
                     size={88}
                     testID='about.logo'
-                />
+                /> */}
                 <Title
                     config={config}
                     license={license}
@@ -307,7 +307,7 @@ const About = ({componentId, config, license}: AboutProps) => {
                         size='m'
                     />
                 </View>
-                {license?.IsLicensed === 'true' && (
+                {/* {license?.IsLicensed === 'true' && (
                     <View style={styles.licenseContainer}>
                         <FormattedText
                             defaultMessage='Licensed to: {company}'
@@ -324,7 +324,7 @@ const About = ({componentId, config, license}: AboutProps) => {
                 />
                 {!MATTERMOST_BUNDLE_IDS.includes(applicationId || '') &&
                     <FormattedText
-                        defaultMessage='{site} is powered by Mattermost'
+                        defaultMessage='{site} is powered by Oktel'
                         id={'settings.about.powered_by'}
                         style={styles.footerText}
                         testID='about.powered_by'
@@ -335,7 +335,7 @@ const About = ({componentId, config, license}: AboutProps) => {
                     style={styles.thinLine}
                 />
                 <FormattedText
-                    defaultMessage='Copyright 2015-{currentYear} Mattermost, Inc. All rights reserved'
+                    defaultMessage='Copyright 2015-{currentYear} Oktel. All rights reserved'
                     id={'settings.about.copyright'}
                     style={[styles.footerText, styles.copyrightText]}
                     testID='about.copyright'
@@ -351,7 +351,7 @@ const About = ({componentId, config, license}: AboutProps) => {
                 <View style={styles.noticeContainer}>
                     <FormattedText
                         id={'settings.notice_text'}
-                        defaultMessage='Mattermost is made possible by the open source software used in our {platform} and {mobile}.'
+                        defaultMessage='Oktel is made possible by the open source software used in our {platform} and {mobile}.'
                         style={styles.footerText}
                         values={{
                             platform: (
@@ -417,7 +417,7 @@ const About = ({componentId, config, license}: AboutProps) => {
                     >
                         {config.BuildDate}
                     </Text>
-                </View>
+                </View> */}
             </View>
         </SettingContainer>
     );

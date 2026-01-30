@@ -4,8 +4,9 @@
 import React from 'react';
 import {StyleSheet, View} from 'react-native';
 
-import AttachmentAction from './attachment_quick_action';
-import EmojiAction from './emoji_quick_action';
+import CameraAction from './camera_quick_action';
+import FileAction from './file_quick_action';
+import ImageAction from './image_quick_action';
 import InputAction from './input_quick_action';
 import PostPriorityAction from './post_priority_action';
 
@@ -16,7 +17,6 @@ type Props = {
     isPostPriorityEnabled: boolean;
     canShowPostPriority?: boolean;
     canShowSlashCommands?: boolean;
-    canShowEmojiPicker?: boolean;
     maxFileCount: number;
 
     // Draft Handler
@@ -35,7 +35,6 @@ const style = StyleSheet.create({
         display: 'flex',
         flexDirection: 'row',
         height: QUICK_ACTIONS_HEIGHT,
-        marginLeft: 8,
     },
 });
 
@@ -47,7 +46,6 @@ export default function QuickActions({
     isPostPriorityEnabled,
     canShowSlashCommands = true,
     canShowPostPriority,
-    canShowEmojiPicker = true,
     maxFileCount,
     updateValue,
     addFiles,
@@ -60,8 +58,9 @@ export default function QuickActions({
 
     const atInputActionTestID = `${testID}.at_input_action`;
     const slashInputActionTestID = `${testID}.slash_input_action`;
-    const emojiActionTestID = `${testID}.emoji_action`;
-    const attachmentActionTestID = `${testID}.attachment_action`;
+    const fileActionTestID = `${testID}.file_action`;
+    const imageActionTestID = `${testID}.image_action`;
+    const cameraActionTestID = `${testID}.camera_action`;
     const postPriorityActionTestID = `${testID}.post_priority_action`;
 
     const uploadProps = {
@@ -77,10 +76,6 @@ export default function QuickActions({
             testID={testID}
             style={style.quickActionsContainer}
         >
-            <AttachmentAction
-                testID={attachmentActionTestID}
-                {...uploadProps}
-            />
             <InputAction
                 testID={atInputActionTestID}
                 disabled={atDisabled}
@@ -97,11 +92,18 @@ export default function QuickActions({
                     focus={focus}
                 />
             )}
-            {canShowEmojiPicker && (
-                <EmojiAction
-                    testID={emojiActionTestID}
-                />
-            )}
+            <FileAction
+                testID={fileActionTestID}
+                {...uploadProps}
+            />
+            <ImageAction
+                testID={imageActionTestID}
+                {...uploadProps}
+            />
+            <CameraAction
+                testID={cameraActionTestID}
+                {...uploadProps}
+            />
             {isPostPriorityEnabled && canShowPostPriority && (
                 <PostPriorityAction
                     testID={postPriorityActionTestID}

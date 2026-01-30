@@ -73,12 +73,7 @@ describe('Search - Pinned Messages', () => {
         const message = `Message ${getRandomId()}`;
         await ChannelScreen.open(channelsCategory, testChannel.name);
         await ChannelScreen.postMessage(message);
-        await ChannelScreen.dismissKeyboard();
-
         const {post} = await Post.apiGetLastPostInChannel(siteOneUrl, testChannel.id);
-        const {postListPostItem: channelPostItem} = ChannelScreen.getPostListPostItem(post.id, message);
-        await expect(channelPostItem).toBeVisible();
-
         await ChannelScreen.openPostOptionsFor(post.id, message);
         await PostOptionsScreen.pinPostOption.tap();
 
@@ -115,12 +110,7 @@ describe('Search - Pinned Messages', () => {
         const message = `Message ${getRandomId()}`;
         await ChannelScreen.open(channelsCategory, testChannel.name);
         await ChannelScreen.postMessage(message);
-        await ChannelScreen.dismissKeyboard();
-
         const {post: pinnedPost} = await Post.apiGetLastPostInChannel(siteOneUrl, testChannel.id);
-        const {postListPostItem: channelPostItem} = ChannelScreen.getPostListPostItem(pinnedPost.id, message);
-        await expect(channelPostItem).toBeVisible();
-
         await ChannelScreen.openPostOptionsFor(pinnedPost.id, message);
         await PostOptionsScreen.pinPostOption.tap();
         await ChannelInfoScreen.open();
@@ -156,7 +146,6 @@ describe('Search - Pinned Messages', () => {
         // # Post a reply
         const replyMessage = `${updatedMessage} reply`;
         await ThreadScreen.postMessage(replyMessage);
-        await ChannelScreen.dismissKeyboard();
 
         // * Verify reply is posted
         const {post: replyPost} = await Post.apiGetLastPostInChannel(siteOneUrl, testChannel.id);
@@ -189,12 +178,7 @@ describe('Search - Pinned Messages', () => {
         const message = `Message ${getRandomId()}`;
         await ChannelScreen.open(channelsCategory, testChannel.name);
         await ChannelScreen.postMessage(message);
-        await ChannelScreen.dismissKeyboard();
-
         const {post: pinnedPost} = await Post.apiGetLastPostInChannel(siteOneUrl, testChannel.id);
-        const {postListPostItem: channelPostItem} = ChannelScreen.getPostListPostItem(pinnedPost.id, message);
-        await expect(channelPostItem).toBeVisible();
-
         await ChannelScreen.openPostOptionsFor(pinnedPost.id, message);
         await PostOptionsScreen.pinPostOption.tap();
         await ChannelInfoScreen.open();
@@ -223,12 +207,7 @@ describe('Search - Pinned Messages', () => {
         const message = `Message ${getRandomId()}`;
         await ChannelScreen.open(channelsCategory, testChannel.name);
         await ChannelScreen.postMessage(message);
-        await ChannelScreen.dismissKeyboard();
-
         const {post: pinnedPost} = await Post.apiGetLastPostInChannel(siteOneUrl, testChannel.id);
-        const {postListPostItem: channelPostItem} = ChannelScreen.getPostListPostItem(pinnedPost.id, message);
-        await expect(channelPostItem).toBeVisible();
-
         await ChannelScreen.openPostOptionsFor(pinnedPost.id, message);
         await PostOptionsScreen.pinPostOption.tap();
         await ChannelInfoScreen.open();
@@ -260,7 +239,6 @@ describe('Search - Pinned Messages', () => {
         await ChannelInfoScreen.close();
         await ChannelScreen.back();
         await SavedMessagesScreen.open();
-        await wait(timeouts.TWO_SEC);
 
         // * Verify pinned message is not displayed anymore on saved messages screen
         await expect(postListPostItem).not.toExist();

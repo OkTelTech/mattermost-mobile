@@ -25,7 +25,7 @@ import {
     ThreadOptionsScreen,
     ThreadScreen,
 } from '@support/ui/screen';
-import {getRandomId, timeouts} from '@support/utils';
+import {getRandomId} from '@support/utils';
 import {expect} from 'detox';
 
 describe('Threads - Reply to Thread', () => {
@@ -57,16 +57,10 @@ describe('Threads - Reply to Thread', () => {
         const parentMessage = `Message ${getRandomId()}`;
         await ChannelScreen.open(channelsCategory, testChannel.name);
         await ChannelScreen.postMessage(parentMessage);
-        await ChannelScreen.dismissKeyboard();
-
         const {post: parentPost} = await Post.apiGetLastPostInChannel(siteOneUrl, testChannel.id);
-        const {postListPostItem} = ChannelScreen.getPostListPostItem(parentPost.id, parentMessage);
-        await waitFor(postListPostItem).toBeVisible().withTimeout(timeouts.TEN_SEC);
-
         await ChannelScreen.openReplyThreadFor(parentPost.id, parentMessage);
         const replyMessage = `${parentMessage} reply`;
         await ThreadScreen.postMessage(replyMessage);
-        await ChannelScreen.dismissKeyboard();
         await ThreadScreen.back();
         await ChannelScreen.back();
         await GlobalThreadsScreen.open();
@@ -84,12 +78,11 @@ describe('Threads - Reply to Thread', () => {
         // # Add new reply to thread
         const newReplyMessage = `${parentMessage} new reply`;
         await ThreadScreen.postMessage(newReplyMessage);
-        await ChannelScreen.dismissKeyboard();
 
         // * Verify new reply is posted
         const {post: newReplyPost} = await Post.apiGetLastPostInChannel(siteOneUrl, testChannel.id);
-        const {postListPostItem: newReplyPostItem} = ThreadScreen.getPostListPostItem(newReplyPost.id, newReplyMessage);
-        await expect(newReplyPostItem).toBeVisible();
+        const {postListPostItem} = ThreadScreen.getPostListPostItem(newReplyPost.id, newReplyMessage);
+        await expect(postListPostItem).toBeVisible();
 
         // # Go back to channel list screen
         await ThreadScreen.back();
@@ -101,15 +94,10 @@ describe('Threads - Reply to Thread', () => {
         const parentMessage = `Message ${getRandomId()}`;
         await ChannelScreen.open(channelsCategory, testChannel.name);
         await ChannelScreen.postMessage(parentMessage);
-        await ChannelScreen.dismissKeyboard();
         const {post: parentPost} = await Post.apiGetLastPostInChannel(siteOneUrl, testChannel.id);
-        const {postListPostItem} = ChannelScreen.getPostListPostItem(parentPost.id, parentMessage);
-        await waitFor(postListPostItem).toBeVisible().withTimeout(timeouts.TEN_SEC);
         await ChannelScreen.openReplyThreadFor(parentPost.id, parentMessage);
         const replyMessage = `${parentMessage} reply`;
         await ThreadScreen.postMessage(replyMessage);
-        await ChannelScreen.dismissKeyboard();
-
         await ThreadScreen.back();
         await ChannelScreen.back();
         await GlobalThreadsScreen.open();
@@ -126,12 +114,11 @@ describe('Threads - Reply to Thread', () => {
         // # Add new reply to thread
         const newReplyMessage = `${parentMessage} new reply`;
         await ThreadScreen.postMessage(newReplyMessage);
-        await ChannelScreen.dismissKeyboard();
 
         // * Verify new reply is posted
         const {post: newReplyPost} = await Post.apiGetLastPostInChannel(siteOneUrl, testChannel.id);
-        const {postListPostItem: newReplyPostItem} = ThreadScreen.getPostListPostItem(newReplyPost.id, newReplyMessage);
-        await expect(newReplyPostItem).toBeVisible();
+        const {postListPostItem} = ThreadScreen.getPostListPostItem(newReplyPost.id, newReplyMessage);
+        await expect(postListPostItem).toBeVisible();
 
         // # Go back to channel list screen
         await ThreadScreen.back();

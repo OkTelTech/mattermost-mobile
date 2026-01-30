@@ -26,7 +26,6 @@ import type {LaunchProps} from '@typings/launch';
 import type {AvailableScreens, NavButtons} from '@typings/screens/navigation';
 import type {ComponentProps} from 'react';
 import type {IntlShape} from 'react-intl';
-import type {Asset} from 'react-native-image-picker';
 
 const alpha = {
     from: 0,
@@ -255,7 +254,7 @@ Appearance.addChangeListener(() => {
     const theme = getThemeFromState();
     const screens = NavigationStore.getScreensInStack();
 
-    if (screens.includes(Screens.SERVER) || screens.includes(Screens.ONBOARDING)) {
+    if (screens.includes(Screens.SERVER) || screens.includes(Screens.ONBOARDING) || screens.includes(Screens.LOGIN) || screens.includes(Screens.SSO)) {
         for (const screen of screens) {
             if (appearanceControlledScreens.has(screen)) {
                 Navigation.updateProps(screen, {theme});
@@ -392,6 +391,77 @@ export function resetToSelectServer(passProps: LaunchProps) {
                 ...passProps,
                 theme,
             },
+            options: {
+                layout: {
+                    backgroundColor: theme.centerChannelBg,
+                    componentBackgroundColor: theme.centerChannelBg,
+                },
+                statusBar: {
+                    visible: true,
+                    backgroundColor: theme.sidebarBg,
+                    ...edgeToEdge,
+                },
+                topBar: {
+                    backButton: {
+                        color: theme.sidebarHeaderTextColor,
+                        title: '',
+                    },
+                    background: {
+                        color: theme.sidebarBg,
+                    },
+                    visible: false,
+                    height: 0,
+                },
+            },
+        },
+    }];
+
+    return Navigation.setRoot({
+        root: {
+            stack: {
+                children,
+            },
+        },
+    });
+}
+
+export interface ResetToLoginProps {
+    config: ClientConfig;
+    enabledSSOs: string[];
+    extra?: LaunchProps['extra'];
+    hasLoginForm: boolean;
+    launchError?: Boolean;
+    launchType: LaunchProps['launchType'];
+    license: ClientLicense;
+    numberSSOs: number;
+    serverDisplayName: string;
+    serverPreauthSecret?: string;
+    serverUrl: string;
+    ssoOptions: SsoWithOptions;
+}
+
+export function resetToLogin(passProps: ResetToLoginProps) {
+    const theme = getDefaultThemeByAppearance();
+    const edgeToEdge = edgeToEdgeHack(Screens.LOGIN, theme);
+
+    const {enabledSSOs, hasLoginForm, numberSSOs} = passProps;
+    const redirectSSO = !hasLoginForm && numberSSOs === 1;
+    const screen = redirectSSO ? Screens.SSO : Screens.LOGIN;
+
+    const screenPassProps: Record<string, unknown> = {
+        ...passProps,
+        theme,
+    };
+
+    if (redirectSSO) {
+        screenPassProps.ssoType = enabledSSOs[0];
+    }
+
+    const children = [{
+        component: {
+            id: screen,
+            name: screen,
+            passProps: screenPassProps,
             options: {
                 layout: {
                     backgroundColor: theme.centerChannelBg,
@@ -912,28 +982,6 @@ export function openAsBottomSheet({closeButtonId, screen, theme, title, props}: 
     } else {
         showModalOverCurrentContext(screen, props, bottomSheetModalOptions(theme));
     }
-}
-
-export function openAttachmentOptions(
-    intl: IntlShape,
-    theme: Theme,
-    props: {
-        onUploadFiles: (files: Asset[]) => void;
-        maxFilesReached: boolean;
-        canUploadFiles: boolean;
-        testID?: string;
-        fileCount?: number;
-        maxFileCount?: number;
-    },
-) {
-    const title = intl.formatMessage({id: 'mobile.file_attachment.title', defaultMessage: 'Files and media'});
-    openAsBottomSheet({
-        closeButtonId: 'attachment-close-id',
-        screen: Screens.ATTACHMENT_OPTIONS,
-        theme,
-        title,
-        props,
-    });
 }
 
 export const showAppForm = async (form: AppForm, context: AppContext) => {

@@ -2,10 +2,9 @@
 // See LICENSE.txt for license information.
 
 import {withDatabase, withObservables} from '@nozbe/watermelondb/react';
-import {combineLatest, of} from 'rxjs';
+import {of} from 'rxjs';
 import {switchMap} from 'rxjs/operators';
 
-import {observeHasRunningPlaybookRunsInTeam} from '@playbooks/database/queries/run';
 import {observeIsPlaybooksEnabled} from '@playbooks/database/queries/version';
 import {observeDraftCount} from '@queries/servers/drafts';
 import {observeScheduledPostEnabled, observeScheduledPostsForTeam} from '@queries/servers/scheduled_post';
@@ -29,13 +28,7 @@ const enchanced = withObservables([], ({database}: WithDatabaseArgs) => {
         switchMap((scheduledPosts) => of(hasScheduledPostError(scheduledPosts))),
     );
     const scheduledPostsEnabled = observeScheduledPostEnabled(database);
-    const showPlaybooksButton = currentTeamId.pipe(
-        switchMap((teamId) => combineLatest([
-            observeIsPlaybooksEnabled(database),
-            observeHasRunningPlaybookRunsInTeam(database, teamId),
-        ])),
-        switchMap(([enabled, hasRunningRuns]) => of(enabled && hasRunningRuns)),
-    );
+    const playbooksEnabled = observeIsPlaybooksEnabled(database);
 
     return {
         lastChannelId,
@@ -43,7 +36,7 @@ const enchanced = withObservables([], ({database}: WithDatabaseArgs) => {
         scheduledPostCount,
         scheduledPostHasError,
         scheduledPostsEnabled,
-        showPlaybooksButton,
+        playbooksEnabled,
     };
 });
 

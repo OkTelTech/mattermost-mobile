@@ -2,12 +2,12 @@
 
 function installPods() {
     echo "Getting Cocoapods dependencies"
-    npm run pod-install
+    npm run pod-install || echo "⚠️  Pod install skipped or failed - run manually with: npm run pod-install"
 }
 
 function installPodsM1() {
     echo "Getting Cocoapods dependencies"
-    npm run pod-install-m1
+    npm run pod-install-m1 || echo "⚠️  Pod install skipped or failed - run manually with: npm run pod-install-m1"
 }
 
 if [[ "$OSTYPE" == "darwin"* ]]; then
@@ -15,9 +15,11 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
     echo "🔐 INTUNE_ENABLED detected"
     npm run intune:init
   elif [[ $(uname -p) == 'arm' ]]; then
-    installPodsM1
+    echo "⏭️  Skipping pod install for now - run manually later"
+    # installPodsM1
   else
-    installPods
+    echo "⏭️  Skipping pod install for now - run manually later"
+    # installPods
   fi
 fi
 

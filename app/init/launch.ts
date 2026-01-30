@@ -8,6 +8,8 @@ import {Notifications} from 'react-native-notifications';
 import {removePost} from '@actions/local/post';
 import {switchToChannelById} from '@actions/remote/channel';
 import {appEntry, pushNotificationEntry, upgradeEntry} from '@actions/remote/entry';
+import {doPing} from '@actions/remote/general';
+import {fetchConfigAndLicense} from '@actions/remote/systems';
 import {fetchAndSwitchToThread} from '@actions/remote/thread';
 import LocalConfig from '@assets/config.json';
 import {DeepLink, Events, Launch, PushNotification} from '@constants';
@@ -15,18 +17,20 @@ import {PostTypes} from '@constants/post';
 import DatabaseManager from '@database/manager';
 import {getActiveServerUrl, getServerCredentials, removeServerCredentials} from '@init/credentials';
 import PerformanceMetricsManager from '@managers/performance_metrics_manager';
+import SecurityManager from '@managers/security_manager';
 import {getLastViewedChannelIdAndServer, getOnboardingViewed, getLastViewedThreadIdAndServer} from '@queries/app/global';
 import {getAllServers} from '@queries/app/servers';
 import {queryPostsByType} from '@queries/servers/post';
 import {getThemeForCurrentTeam} from '@queries/servers/preference';
 import {getCurrentUserId} from '@queries/servers/system';
 import {queryMyTeams} from '@queries/servers/team';
-import {resetToHome, resetToSelectServer, resetToTeams, resetToOnboarding} from '@screens/navigation';
+import {resetToHome, resetToLogin, resetToSelectServer, resetToTeams, resetToOnboarding} from '@screens/navigation';
 import EphemeralStore from '@store/ephemeral_store';
 import {getLaunchPropsFromDeepLink, handleDeepLink} from '@utils/deep_link';
-import {logInfo} from '@utils/log';
+import {logError, logInfo} from '@utils/log';
+import {loginOptions} from '@utils/server';
 import {convertToNotificationData} from '@utils/notification';
-import {removeProtocol} from '@utils/url';
+import {removeProtocol, getServerUrlAfterRedirect, sanitizeUrl} from '@utils/url';
 
 import type {DeepLinkWithData, LaunchProps} from '@typings/launch';
 
@@ -172,7 +176,94 @@ export const launchApp = async (props: LaunchProps) => {
         return resetToOnboarding(props);
     }
 
+    // Auto-connect to the default server URL, skipping the Server screen
+    if (LocalConfig.AutoSelectServerUrl && LocalConfig.DefaultServerUrl) {
+        return autoConnectToDefaultServer(props);
+    }
+
     return resetToSelectServer(props);
+};
+
+const showConnectionErrorAndExit = () => {
+    Alert.alert(
+        'Cannot connect to server',
+        'Please check your network connection and try again.',
+        [{
+            text: 'OK',
+            onPress: () => Emm.exitApp(),
+        }],
+        {cancelable: false},
+    );
+};
+
+const autoConnectToDefaultServer = async (props: LaunchProps): Promise<string> => {
+    const serverUrl = sanitizeUrl(LocalConfig.DefaultServerUrl);
+    const serverDisplayName = LocalConfig.DefaultServerName || serverUrl;
+
+    try {
+        // Step 1: Check redirect and ping
+        const headRequest = await getServerUrlAfterRedirect(serverUrl, false);
+        if (!headRequest.url) {
+            logError('[autoConnect] Server URL redirect failed:', serverUrl);
+            showConnectionErrorAndExit();
+            return '';
+        }
+
+        const pingResult = await doPing(headRequest.url, true);
+        if (pingResult.error) {
+            logError('[autoConnect] Ping failed:', pingResult.error);
+            showConnectionErrorAndExit();
+            return '';
+        }
+
+        // Step 2: Fetch config and license
+        const data = await fetchConfigAndLicense(headRequest.url, true);
+        if (data.error || !data.config?.DiagnosticId) {
+            logError('[autoConnect] fetchConfigAndLicense failed:', data.error);
+            showConnectionErrorAndExit();
+            return '';
+        }
+
+        // Step 3: Security checks
+        if (data.config.MobileJailbreakProtection === 'true') {
+            const isJailbroken = await SecurityManager.isDeviceJailbroken(headRequest.url, data.config.SiteName);
+            if (isJailbroken) {
+                showConnectionErrorAndExit();
+                return '';
+            }
+        }
+
+        if (data.config.MobileEnableBiometrics === 'true') {
+            const biometricsResult = await SecurityManager.authenticateWithBiometrics(headRequest.url, data.config.SiteName);
+            if (!biometricsResult) {
+                showConnectionErrorAndExit();
+                return '';
+            }
+        }
+
+        // Step 4: Navigate directly to Login/SSO
+        const {enabledSSOs, hasLoginForm, numberSSOs, ssoOptions} = loginOptions(data.config, data.license!);
+
+        resetToLogin({
+            config: data.config,
+            enabledSSOs,
+            extra: props.extra,
+            hasLoginForm,
+            launchError: props.launchError,
+            launchType: props.launchType,
+            license: data.license!,
+            numberSSOs,
+            serverDisplayName,
+            serverUrl: headRequest.url,
+            ssoOptions,
+        });
+
+        return '';
+    } catch (error) {
+        logError('[autoConnect] Unexpected error:', error);
+        showConnectionErrorAndExit();
+        return '';
+    }
 };
 
 export const launchToHome = async (props: LaunchProps) => {

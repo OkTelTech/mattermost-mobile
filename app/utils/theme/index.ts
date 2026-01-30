@@ -219,8 +219,10 @@ export function blendColors(background: string, foreground: string, opacity: num
 }
 
 const themeTypeMap: ThemeTypeMap = {
+    Oktel: 'denim',
     Mattermost: 'denim',
     Organization: 'sapphire',
+    'Oktel Dark': 'indigo',
     'Mattermost Dark': 'indigo',
     'Windows Dark': 'onyx',
     Denim: 'denim',

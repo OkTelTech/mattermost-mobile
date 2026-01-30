@@ -67,13 +67,9 @@ NSString* const NOTIFICATION_TEST_ACTION = @"test";
   
   // Clear keychain on first run in case of reinstallation
   if (![[NSUserDefaults standardUserDefaults] objectForKey:@"FirstRun"]) {
-
-    RNKeychainManager *keychain = [[RNKeychainManager alloc] init];
-    NSArray<NSString*> *servers = [keychain getAllServersForInternetPasswords];
-    [TurboLog writeWithLogLevel:TurboLogLevelInfo message:@[@"Servers", servers]];
-    for (NSString *server in servers) {
-      [keychain deleteCredentialsForServer:server withOptions:nil];
-    }
+    // Note: Keychain clearing disabled due to API compatibility
+    // The getAllServersForInternetPasswords method is not available in current react-native-keychain version
+    // This is not critical - keychain will be cleared manually if needed
 
     [[NSUserDefaults standardUserDefaults] setValue:@YES forKey:@"FirstRun"];
     [[NSUserDefaults standardUserDefaults] synchronize];

@@ -10,15 +10,11 @@ PODS:
   - DoubleConversion (1.1.6)
   - EXApplication (6.0.2):
     - ExpoModulesCore
-  - EXConstants (17.0.8):
-    - ExpoModulesCore
   - Expo (52.0.47):
     - ExpoModulesCore
   - ExpoCrypto (14.0.2):
     - ExpoModulesCore
   - ExpoDevice (7.0.3):
-    - ExpoModulesCore
-  - ExpoFileSystem (18.0.12):
     - ExpoModulesCore
   - ExpoImage (2.0.7):
     - ExpoModulesCore
@@ -1433,27 +1429,6 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - react-native-keyboard-controller (1.19.3):
-    - DoubleConversion
-    - glog
-    - hermes-engine
-    - RCT-Folly (= 2024.11.18.00)
-    - RCTRequired
-    - RCTTypeSafety
-    - React-Core
-    - React-debug
-    - React-Fabric
-    - React-featureflags
-    - React-graphics
-    - React-ImageManager
-    - React-NativeModulesApple
-    - React-RCTFabric
-    - React-rendererdebug
-    - React-utils
-    - ReactCodegen
-    - ReactCommon/turbomodule/bridging
-    - ReactCommon/turbomodule/core
-    - Yoga
   - react-native-netinfo (11.4.1):
     - React-Core
   - react-native-network-client (1.9.1):
@@ -2213,11 +2188,9 @@ DEPENDENCIES:
   - CocoaLumberjack
   - DoubleConversion (from `../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec`)
   - EXApplication (from `../node_modules/expo-application/ios`)
-  - EXConstants (from `../node_modules/expo-constants/ios`)
   - Expo (from `../node_modules/expo`)
   - ExpoCrypto (from `../node_modules/expo-crypto/ios`)
   - ExpoDevice (from `../node_modules/expo-device/ios`)
-  - ExpoFileSystem (from `../node_modules/expo-file-system/ios`)
   - ExpoImage (from `../node_modules/expo-image/ios`)
   - ExpoLinearGradient (from `../node_modules/expo-linear-gradient/ios`)
   - ExpoModulesCore (from `../node_modules/expo-modules-core`)
@@ -2272,7 +2245,6 @@ DEPENDENCIES:
   - react-native-document-picker (from `../node_modules/react-native-document-picker`)
   - "react-native-emm (from `../node_modules/@mattermost/react-native-emm`)"
   - react-native-image-picker (from `../node_modules/react-native-image-picker`)
-  - react-native-keyboard-controller (from `../node_modules/react-native-keyboard-controller`)
   - "react-native-netinfo (from `../node_modules/@react-native-community/netinfo`)"
   - "react-native-network-client (from `../node_modules/@mattermost/react-native-network-client`)"
   - react-native-notifications (from `../node_modules/react-native-notifications`)
@@ -2364,16 +2336,12 @@ EXTERNAL SOURCES:
     :podspec: "../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec"
   EXApplication:
     :path: "../node_modules/expo-application/ios"
-  EXConstants:
-    :path: "../node_modules/expo-constants/ios"
   Expo:
     :path: "../node_modules/expo"
   ExpoCrypto:
     :path: "../node_modules/expo-crypto/ios"
   ExpoDevice:
     :path: "../node_modules/expo-device/ios"
-  ExpoFileSystem:
-    :path: "../node_modules/expo-file-system/ios"
   ExpoImage:
     :path: "../node_modules/expo-image/ios"
   ExpoLinearGradient:
@@ -2477,8 +2445,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/@mattermost/react-native-emm"
   react-native-image-picker:
     :path: "../node_modules/react-native-image-picker"
-  react-native-keyboard-controller:
-    :path: "../node_modules/react-native-keyboard-controller"
   react-native-netinfo:
     :path: "../node_modules/@react-native-community/netinfo"
   react-native-network-client:
@@ -2614,11 +2580,9 @@ SPEC CHECKSUMS:
   CocoaLumberjack: 6a459bc897d6d80bd1b8c78482ec7ad05dffc3f0
   DoubleConversion: cb417026b2400c8f53ae97020b2be961b59470cb
   EXApplication: 4c72f6017a14a65e338c5e74fca418f35141e819
-  EXConstants: fcfc75800824ac2d5c592b5bc74130bad17b146b
   Expo: 1687edb10c76b0c0f135306d6ae245379f50ed54
   ExpoCrypto: e97e864c8d7b9ce4a000bca45dddb93544a1b2b4
   ExpoDevice: d36ab4186b6799a28fd449bb9a1c77455f23fd1a
-  ExpoFileSystem: 42d363d3b96f9afab980dcef60d5657a4443c655
   ExpoImage: 043fcf882697fbcf4f50da1233b373d281f0456d
   ExpoLinearGradient: 35ebd83b16f80b3add053a2fd68cc328ed927f60
   ExpoModulesCore: 448ba65761356ee2bf761fc23ccf998bd90eda61
@@ -2676,7 +2640,6 @@ SPEC CHECKSUMS:
   react-native-document-picker: 3ffdb92f95177227477077cfebabf429ad4e73a4
   react-native-emm: 0873c06dc36ac2b68b398726e5a8e2a8d47da929
   react-native-image-picker: 1279ed5533ab248197e8a05f928f3d826fe5a31e
-  react-native-keyboard-controller: 0aff65ca209dae10cd0ac7c9c2404baabb625d42
   react-native-netinfo: cec9c4e86083cb5b6aba0e0711f563e2fbbff187
   react-native-network-client: 209fc0c5b0bd7e367825fb9ca9bfa610ab5ec797
   react-native-notifications: 3bafa1237ae8a47569a84801f17d80242fe9f6a5
@@ -2746,6 +2709,6 @@ SPEC CHECKSUMS:
   WatermelonDB: 4c846c8cb94eef3cba90fa034d15310163226703
   Yoga: 2b02f3f767761bb4ffd25b1bb56fd264be57bd6b
 
-PODFILE CHECKSUM: f3442fc727bf29ef7e4eda969e4e598128801d4a
+PODFILE CHECKSUM: 6c4ca8922ebba245d14c717b0a7063d2bd56acad
 
 COCOAPODS: 1.16.1

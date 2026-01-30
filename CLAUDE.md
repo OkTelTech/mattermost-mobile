@@ -296,10 +296,8 @@ Located at `libraries/@mattermost/`:
 
 ### Localization (i18n)
 - **CRITICAL**: Only update `en.json` - never modify other language files or Weblate gets corrupted
-- **Adding new strings**: Define the message ID and defaultMessage in code using `defineMessages()`, then run `npm run i18n-extract` to automatically add them to `en.json`
 - Default messages in code must match JSON translations exactly, including newlines
 - Translation IDs should be descriptive enough for translators to understand context
-- Don't reuse translation IDs
 - Translate user-facing strings, not debug/error messages
 
 ### Markdown Component Usage
@@ -366,3 +364,172 @@ Components use hierarchical testIDs: `component.subcomponent.element`
 
 ### Known Issues
 - Many components require `theme` prop - check for `useTheme()` hook in parent component
+
+---
+
+## Session Notes (From Chat History)
+
+### Authentication Mechanism
+**Session Token (Bearer Token)**, NOT JWT:
+- Token stored in iOS Keychain / Android Keystore
+- Sent as `Authorization: Bearer <token>` header
+- CSRF token required for mutation requests (POST, PUT, DELETE)
+- Token refresh handled automatically by the client
+
+### Bot Features in Mattermost Mobile
+
+#### What the App Supports
+- **Bot Badge**: "BOT" tag displayed next to bot usernames
+- **Bot Description**: Text describing the bot's purpose
+- **Direct Messaging**: Users can DM bots directly
+- **Webhook Posts**: Bots can send messages via webhooks with custom icons/usernames
+- **LLM Bot Support**: Special post types (`custom_llmbot`, `custom_llm_postback`)
+
+#### Bot Limitations (vs regular users)
+- No online/away status indicator
+- No custom status emoji
+- No nickname display
+- No local time display
+
+#### Key Bot Files
+- Type definitions: `types/api/bots.d.ts`
+- Bot tag UI: `app/components/tag/bot_tag.tsx`
+- Bot detection utility: `app/utils/user/index.ts` → `isBot(user)`
+- Database model: `app/database/models/server/user.ts` (bots stored as users with `isBot` flag)
+
+#### Bot Creation
+- **Mobile app does NOT support bot creation** - only viewing/interacting
+- Bots created via: Admin Console or `POST /api/v4/bots`
+
+### Interactive Dialogs & Workflow System
+
+The mobile app has full support for slash commands with interactive dialogs (popup forms).
+
+#### Flow: Slash Command → Dialog → Submission
+```
+1. User types /command
+2. SlashSuggestion shows autocomplete (app/components/autocomplete/slash_suggestion/)
+3. executeCommand() sends to server (app/actions/remote/command.ts)
+4. Server returns trigger_id → stored in IntegrationsManager
+5. Server sends WebSocket OPEN_DIALOG event
+6. handleOpenDialogEvent() matches trigger_id (app/actions/websocket/integrations.ts)
+7. InteractiveDialog screen opens (app/screens/interactive_dialog/)
+8. User fills form → submitInteractiveDialog() (app/actions/remote/integrations.ts)
+9. Server validates → returns success or field errors
+```
+
+#### Supported Form Field Types
+| Type | Subtype | Description |
+|------|---------|-------------|
+| `text` | - | Normal text input |
+| `text` | `email` | Email keyboard |
+| `text` | `number` | Number keyboard |
+| `text` | `tel` | Phone keyboard |
+| `text` | `url` | URL keyboard |
+| `text` | `password` | Hidden input |
+| `textarea` | - | Large text area |
+| `select` | - | Dropdown picker |
+| `radio` | - | Radio button group |
+| `bool` | - | Toggle switch |
+
+#### Key Workflow Files
+| File | Purpose |
+|------|---------|
+| `app/actions/remote/command.ts` | Execute slash commands |
+| `app/managers/integrations_manager.ts` | Sync trigger_id + dialog |
+| `app/screens/interactive_dialog/index.tsx` | Dialog form screen |
+| `app/screens/interactive_dialog/dialog_element.tsx` | Render input types |
+| `app/actions/remote/integrations.ts` | Submit form, handle buttons |
+| `app/actions/websocket/integrations.ts` | Receive OPEN_DIALOG event |
+
+#### Action Buttons on Posts
+- Buttons rendered via `app/components/post_list/post/body/content/message_attachments/action_button/`
+- Button click → `postActionWithCookie()` → can trigger new dialog via `trigger_id`
+- Supports colors: `default`, `primary`, `success`, `warning`, `danger`
+
+### Reactotron Debugging (Development Only)
+
+#### Setup
+Reactotron is configured for API debugging in development mode.
+
+#### Files Created
+- `app/utils/reactotron.ts` - Main Reactotron configuration
+- `app/utils/reactotron_api.ts` - API logging helper
+- `app/utils/database_debug.ts` - WatermelonDB debug utilities
+
+#### Usage
+```javascript
+// In Metro terminal, you'll see:
+// ✅ API GET 200 /users/me (45ms)
+// 📤 Request: {...}
+// 📥 Response: {...}
+
+// In Reactotron desktop app:
+// Full request/response details with search
+
+// Database debugging (in React Native debugger console):
+global.dbDebug.logDatabaseStats('https://your-server.com')
+global.dbDebug.logCurrentUser('https://your-server.com')
+global.dbDebug.logChannels('https://your-server.com')
+global.dbDebug.logPosts('https://your-server.com', 'channel-id')
+```
+
+#### Debug Mode Protection
+All Reactotron code is guarded with `__DEV__` checks:
+- `index.ts`: Only loads Reactotron when `__DEV__` is true
+- `reactotron.ts`: Only connects when `__DEV__` is true
+- `reactotron_api.ts`: Functions return immediately if not `__DEV__`
+
+### Viewing WatermelonDB Data
+
+#### Option 1: DB Browser for SQLite
+```bash
+# iOS - Find database in App Group
+~/Library/Developer/CoreSimulator/Devices/<device-id>/data/Containers/Shared/AppGroup/<app-group-id>/databases/
+
+# Android
+adb pull /data/data/com.mattermost.rnbeta/databases/
+```
+
+#### Option 2: Debug Utilities (Runtime)
+Use `global.dbDebug` functions in React Native debugger console.
+
+### Zoom Video Integration Analysis
+
+If implementing Zoom video calls:
+
+#### What's Needed
+1. **Server-side**: OAuth credentials, JWT generation, meeting management API
+2. **Mobile-side**: Use `@zoom/react-native-videosdk` (includes native bridges)
+
+#### Key Points
+- Zoom SDK is native-only (no pure JS version)
+- `@zoom/react-native-videosdk` has pre-built native bridges - no custom native code needed
+- Just npm install + iOS/Android configuration
+
+### Bot Workflow Implementation (For Future Reference)
+
+If building a bot with workflows (attendance, leave requests, etc.):
+
+#### Architecture
+```
+Your Bot Server (Node.js/Python)
+    ↓ REST API / WebSocket
+Mattermost Server
+    ↓ WebSocket events
+Mobile App (UI only - no changes needed)
+```
+
+#### Mobile App Already Supports (No Changes Needed)
+- ✅ Slash command autocomplete
+- ✅ Interactive dialog forms
+- ✅ Action buttons on posts
+- ✅ Push notifications
+- ✅ Real-time updates via WebSocket
+
+#### You Need to Build (Server-side)
+- Command handlers
+- Form schemas (returned from bot)
+- Your own database for storing data
+- Business logic for approval workflows
+- Notification rules

@@ -569,8 +569,7 @@ platform :ios do
               "ADALLogOverrideDisabled" => true,
               "HooksAlwaysEnabled" => true,
               "ADALClientId" => intune_client_id,
-              "ADALRedirectUri" => intune_redirect_uri,
-              "MaxFileProtectionLevel" => "NSFileProtectionCompleteUntilFirstUserAuthentication"
+              "ADALRedirectUri" => intune_redirect_uri
             }
 
             plist["LSApplicationQueriesSchemes"] = [

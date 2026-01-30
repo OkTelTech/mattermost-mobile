@@ -16,7 +16,7 @@ import {bottomSheet} from '@screens/navigation';
 import {bottomSheetSnapPoint} from '@utils/helpers';
 import {sortServersByDisplayName} from '@utils/server';
 
-import ServerList, {AddServerButton} from './servers_list';
+import ServerList from './servers_list';
 
 import type ServersModel from '@typings/database/models/app/servers';
 import type {UnreadMessages, UnreadSubscription} from '@typings/database/subscriptions';
@@ -133,7 +133,7 @@ const Servers = React.forwardRef<ServersRef>((_, ref) => {
             bottomSheet({
                 closeButtonId,
                 renderContent,
-                footerComponent: isTablet ? undefined : AddServerButton,
+                footerComponent: undefined,
                 snapPoints,
                 theme,
                 title: intl.formatMessage({id: 'your.servers', defaultMessage: 'Your servers'}),

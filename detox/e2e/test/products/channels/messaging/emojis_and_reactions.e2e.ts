@@ -26,8 +26,8 @@ import {
     ServerScreen,
     UserProfileScreen,
 } from '@support/ui/screen';
-import {getRandomId, timeouts} from '@support/utils';
-import {expect, waitFor} from 'detox';
+import {getRandomId} from '@support/utils';
+import {expect} from 'detox';
 
 describe('Messaging - Emojis and Reactions', () => {
     const serverOneDisplayName = 'Server 1';
@@ -60,7 +60,6 @@ describe('Messaging - Emojis and Reactions', () => {
         const message = `Message ${getRandomId()}`;
         await ChannelScreen.open(channelsCategory, testChannel.name);
         await ChannelScreen.postMessage(message);
-        await ChannelScreen.dismissKeyboard();
         const {post} = await Post.apiGetLastPostInChannel(siteOneUrl, testChannel.id);
         await ChannelScreen.openPostOptionsFor(post.id, message);
 
@@ -75,13 +74,10 @@ describe('Messaging - Emojis and Reactions', () => {
         // # Open emoji picker screen and add a new reaction
         await EmojiPickerScreen.open(true);
         await EmojiPickerScreen.searchInput.replaceText('clown_face');
-        await EmojiPickerScreen.searchInput.tapReturnKey();
         await element(by.text('🤡')).tap();
 
         // * Verify new reaction is added to the message
-        const reactionElement = element(by.text('🤡').withAncestor(by.id(`channel.post_list.post.${post.id}`)));
-        await waitFor(reactionElement).toExist().withTimeout(timeouts.TWO_SEC);
-        await expect(reactionElement).toExist();
+        await expect(element(by.text('🤡').withAncestor(by.id(`channel.post_list.post.${post.id}`)))).toBeVisible();
 
         // # Open post options for message
         await ChannelScreen.openPostOptionsFor(post.id, message);
@@ -105,18 +101,15 @@ describe('Messaging - Emojis and Reactions', () => {
         const message = `Message ${getRandomId()}`;
         await ChannelScreen.open(channelsCategory, testChannel.name);
         await ChannelScreen.postMessage(message);
-        await ChannelScreen.dismissKeyboard();
         const {post} = await Post.apiGetLastPostInChannel(siteOneUrl, testChannel.id);
         await ChannelScreen.openPostOptionsFor(post.id, message);
         await EmojiPickerScreen.open();
         await EmojiPickerScreen.searchInput.replaceText('fire');
-        await EmojiPickerScreen.searchInput.tapReturnKey();
         await element(by.text('🔥')).tap();
 
         // * Verify reaction is added to the message
         const reaction = element(by.text('🔥').withAncestor(by.id(`channel.post_list.post.${post.id}`)));
-        await waitFor(reaction).toExist().withTimeout(timeouts.TWO_SEC);
-        await expect(reaction).toExist();
+        await expect(reaction).toBeVisible();
 
         // # Long press on the reaction
         await reaction.longPress();
@@ -140,7 +133,6 @@ describe('Messaging - Emojis and Reactions', () => {
         const message = 'brown fox :fox_face: lazy dog :dog:';
         await ChannelScreen.open(channelsCategory, testChannel.name);
         await ChannelScreen.postMessage(message);
-        await ChannelScreen.dismissKeyboard();
 
         // * Verify message is posted with emojis
         const resolvedMessage = 'brown fox 🦊 lazy dog 🐶';
@@ -174,13 +166,11 @@ describe('Messaging - Emojis and Reactions', () => {
         const message = `Message ${getRandomId()}`;
         await ChannelScreen.open(channelsCategory, testChannel.name);
         await ChannelScreen.postMessage(message);
-        await ChannelScreen.dismissKeyboard();
         const {post} = await Post.apiGetLastPostInChannel(siteOneUrl, testChannel.id);
         const searchTerm = 'blahblahblahblah';
         await ChannelScreen.openPostOptionsFor(post.id, message);
         await EmojiPickerScreen.open();
         await EmojiPickerScreen.searchInput.replaceText(searchTerm);
-        await EmojiPickerScreen.searchInput.tapReturnKey();
 
         // * Verify empty search state for emoji picker
         await expect(element(by.text(`No matches found for “${searchTerm}”`))).toBeVisible();
