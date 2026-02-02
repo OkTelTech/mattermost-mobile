@@ -701,6 +701,7 @@
   "mobile.login_options.gitlab": "GitLab",
   "mobile.login_options.google": "Google",
   "mobile.login_options.heading": "Přihlaste se ke Svému Účtu",
+  "mobile.login_options.subtitle": "Collaborate with your team in real-time",
   "mobile.login_options.none": "Nemůžete se ještě přihlásit ke svému účtu. Musí být nakonfigurována alespoň jedna přihlašovací možnost. Kontaktujte svého správce systému pro pomoc.",
   "mobile.login_options.openid": "Open ID",
   "mobile.login_options.saml": "SAML",

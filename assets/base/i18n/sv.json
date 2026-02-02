@@ -741,6 +741,7 @@
   "mobile.login_options.gitlab": "GitLab",
   "mobile.login_options.google": "Google",
   "mobile.login_options.heading": "Logga in på ditt konto",
+  "mobile.login_options.subtitle": "Collaborate with your team in real-time",
   "mobile.login_options.none": "Du kan inte logga in på ditt konto ännu. Minst ett inloggningsalternativ måste vara konfigurerat. Kontakta din systemadministratör för att få hjälp.",
   "mobile.login_options.openid": "Open ID",
   "mobile.login_options.saml": "SAML",

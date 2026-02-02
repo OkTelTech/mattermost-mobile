@@ -651,6 +651,7 @@
   "mobile.login_options.gitlab": "GitLab",
   "mobile.login_options.google": "Google",
   "mobile.login_options.heading": "登入您的帳號",
+  "mobile.login_options.subtitle": "Collaborate with your team in real-time",
   "mobile.login_options.none": "您還不能登入帳號。至少須設定一個登入選項。請聯絡您的系統管理員以獲得協助。",
   "mobile.login_options.openid": "Open ID",
   "mobile.login_options.saml": "SAML",

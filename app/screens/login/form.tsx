@@ -71,12 +71,27 @@ const getStyleSheet = makeStyleSheetFromTheme((theme: Theme) => ({
         width: '60%',
     },
     forgotPasswordTxt: {
-        color: theme.buttonBg,
+        color: '#212121',
         fontSize: 14,
         fontFamily: 'OpenSans-SemiBold',
     },
     loginButtonContainer: {
         marginTop: 20,
+    },
+    loginButton: {
+        backgroundColor: '#212121',
+        borderRadius: 8,
+        height: 52,
+    },
+    loginButtonDisabled: {
+        backgroundColor: 'rgba(33, 33, 33, 0.5)',
+        borderRadius: 8,
+        height: 52,
+    },
+    loginButtonText: {
+        color: '#FFFFFF',
+        fontSize: 16,
+        fontFamily: 'OpenSans-SemiBold',
     },
     endAdornment: {
         top: 2,
@@ -338,6 +353,8 @@ const LoginForm = ({
                 text={intl.formatMessage(isLoading ? messages.signingIn : messages.signIn)}
                 showLoader={isLoading}
                 theme={theme}
+                backgroundStyle={buttonDisabled ? styles.loginButtonDisabled : styles.loginButton}
+                textStyle={styles.loginButtonText}
             />
         </View>
     );

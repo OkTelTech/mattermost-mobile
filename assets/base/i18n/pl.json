@@ -741,6 +741,7 @@
   "mobile.login_options.gitlab": "GitLab",
   "mobile.login_options.google": "Google",
   "mobile.login_options.heading": "Zaloguj się na Swoje Konto",
+  "mobile.login_options.subtitle": "Collaborate with your team in real-time",
   "mobile.login_options.none": "Nie możesz jeszcze zalogować się na swoje konto. Musi być skonfigurowana co najmniej jedna opcja logowania. Skontaktuj się z administratorem systemu, aby uzyskać pomoc.",
   "mobile.login_options.openid": "Open ID",
   "mobile.login_options.saml": "SAML",

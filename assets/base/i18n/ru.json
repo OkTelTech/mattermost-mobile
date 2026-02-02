@@ -676,6 +676,7 @@
   "mobile.login_options.gitlab": "GitLab",
   "mobile.login_options.google": "Google",
   "mobile.login_options.heading": "Войдите в свою учетную запись",
+  "mobile.login_options.subtitle": "Collaborate with your team in real-time",
   "mobile.login_options.none": "Вы пока не можете войти в свою учетную запись. Должен быть настроен хотя бы один вариант входа в систему. Обратитесь за помощью к своему системному администратору.",
   "mobile.login_options.openid": "Open ID",
   "mobile.login_options.saml": "SAML",

@@ -640,6 +640,7 @@
   "mobile.login_options.gitlab": "GitLab",
   "mobile.login_options.google": "Google",
   "mobile.login_options.heading": "Inicia sesión en tu Cuenta",
+  "mobile.login_options.subtitle": "Collaborate with your team in real-time",
   "mobile.login_options.none": "Aún no puedes iniciar sesión en tu cuenta. Se debe configurar al menos una opción de inicio. Contacta a tu Administrador del Sistema para ayuda.",
   "mobile.login_options.openid": "Open ID",
   "mobile.login_options.saml": "SAML",

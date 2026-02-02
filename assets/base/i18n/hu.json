@@ -547,6 +547,7 @@
   "mobile.login_options.gitlab": "",
   "mobile.login_options.google": "",
   "mobile.login_options.heading": "",
+  "mobile.login_options.subtitle": "Collaborate with your team in real-time",
   "mobile.login_options.none": "",
   "mobile.login_options.openid": "",
   "mobile.login_options.saml": "",

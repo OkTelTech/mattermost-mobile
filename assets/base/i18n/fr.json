@@ -658,6 +658,7 @@
   "mobile.login_options.gitlab": "GitLab",
   "mobile.login_options.google": "Google",
   "mobile.login_options.heading": "Connectez-vous à votre compte",
+  "mobile.login_options.subtitle": "Collaborate with your team in real-time",
   "mobile.login_options.none": "Vous ne pouvez pas encore vous connecter à votre compte. Au moins une option de connexion doit être configurée. Contactez votre administrateur système pour obtenir de l'aide.",
   "mobile.login_options.openid": "Open ID",
   "mobile.login_options.saml": "SAML",
