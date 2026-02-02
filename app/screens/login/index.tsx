@@ -77,6 +77,8 @@ const getStyles = makeStyleSheetFromTheme((theme: Theme) => ({
     },
     subtitle: {
         color: 'rgba(255,255,255,0.7)',
+        paddingHorizontal: 24,
+        textAlign: 'center' as const,
         ...typography('Body', 200, 'Regular'),
     },
     whiteCard: {

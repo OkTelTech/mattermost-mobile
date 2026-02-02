@@ -1,13 +1,11 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import React, {useCallback, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {defineMessages, useIntl} from 'react-intl';
-import {Keyboard, Platform, Text, View} from 'react-native';
+import {Image, Keyboard, Platform, StatusBar, Text, View} from 'react-native';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {Navigation} from 'react-native-navigation';
-import Animated from 'react-native-reanimated';
-import {SafeAreaView} from 'react-native-safe-area-context';
 
 import {sendPasswordResetEmail} from '@actions/remote/session';
 import Button from '@components/button';
@@ -15,17 +13,21 @@ import FloatingTextInput from '@components/floating_input/floating_text_input_la
 import FormattedText from '@components/formatted_text';
 import {Screens} from '@constants';
 import useAndroidHardwareBackHandler from '@hooks/android_back_handler';
-import {useAvoidKeyboard} from '@hooks/device';
-import {useScreenTransitionAnimation} from '@hooks/screen_transition_animation';
+import {useAvoidKeyboard, useIsTablet} from '@hooks/device';
 import SecurityManager from '@managers/security_manager';
-import Background from '@screens/background';
 import {isEmail} from '@utils/helpers';
-import {changeOpacity, makeStyleSheetFromTheme} from '@utils/theme';
+import {makeStyleSheetFromTheme} from '@utils/theme';
 import {typography} from '@utils/typography';
 
 import Inbox from './inbox';
 
 import type {AvailableScreens} from '@typings/screens/navigation';
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const backgroundLogin = require('@assets/images/background_login.png');
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const oktelLogo = require('@assets/images/logo_oktel.png');
 
 type Props = {
     componentId: AvailableScreens;
@@ -33,62 +35,118 @@ type Props = {
     theme: Theme;
 }
 
-const AnimatedSafeArea = Animated.createAnimatedComponent(SafeAreaView);
-
 const getStyleSheet = makeStyleSheetFromTheme((theme: Theme) => ({
-    centered: {
-        width: '100%',
-        maxWidth: 600,
-    },
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-        marginTop: Platform.select({android: 56}),
-    },
-    error: {
-        marginTop: 64,
-    },
     flex: {
         flex: 1,
     },
-    form: {
-        marginTop: 20,
+    outerContainer: {
+        flex: 1,
+        backgroundColor: 'rgba(0,0,0,0.8)',
     },
-    header: {
-        color: theme.centerChannelColor,
-        marginBottom: 12,
-        ...typography('Heading', 1000, 'SemiBold'),
-    },
-    innerContainer: {
-        alignItems: 'center',
+    backgroundImage: {
+        position: 'absolute' as const,
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        width: '100%',
         height: '100%',
-        justifyContent: 'center',
+        opacity: 1,
+    },
+    topSection: {
+        paddingTop: Platform.select({ios: 60, android: 40}),
+        paddingBottom: 40,
+        alignItems: 'center' as const,
+        justifyContent: 'center' as const,
+    },
+    topSectionTablet: {
+        paddingTop: 100,
+        paddingBottom: 60,
+    },
+    logo: {
+        width: 200,
+        height: 80,
+        marginBottom: 24,
+    },
+    logoTablet: {
+        width: 280,
+        height: 110,
+        marginBottom: 32,
+    },
+    title: {
+        color: '#FFFFFF',
+        marginBottom: 8,
+        ...typography('Heading', 700, 'SemiBold'),
+    },
+    subtitle: {
+        color: 'rgba(255,255,255,0.7)',
         paddingHorizontal: 24,
-    },
-    returnButtonContainer: {
-        marginTop: 32,
-    },
-    subheader: {
-        color: changeOpacity(theme.centerChannelColor, 0.6),
-        marginBottom: 12,
+        textAlign: 'center' as const,
         ...typography('Body', 200, 'Regular'),
     },
+    whiteCard: {
+        backgroundColor: '#FFFFFF',
+        borderRadius: 20,
+        marginHorizontal: 16,
+        padding: 24,
+        gap: 24,
+        ...Platform.select({
+            ios: {
+                shadowColor: '#FFFFFF',
+                shadowOffset: {width: 0, height: 0.5},
+                shadowOpacity: 0.25,
+                shadowRadius: 9,
+            },
+            android: {
+                elevation: 4,
+            },
+        }),
+    },
+    whiteCardTablet: {
+        maxWidth: 500,
+        alignSelf: 'center' as const,
+        marginHorizontal: 0,
+    },
+    form: {
+        gap: 24,
+    },
+    buttonContainer: {
+        marginTop: 20,
+    },
+    loginButton: {
+        backgroundColor: '#212121',
+        borderRadius: 8,
+        height: 52,
+    },
+    loginButtonDisabled: {
+        backgroundColor: 'rgba(33, 33, 33, 0.5)',
+        borderRadius: 8,
+        height: 52,
+    },
+    loginButtonText: {
+        color: '#FFFFFF',
+        fontSize: 16,
+        fontFamily: 'OpenSans-SemiBold',
+    },
     successContainer: {
-        alignItems: 'center',
+        alignItems: 'center' as const,
         paddingHorizontal: 24,
-        justifyContent: 'center',
+        justifyContent: 'center' as const,
         flex: 1,
     },
     successText: {
-        color: changeOpacity(theme.centerChannelColor, 0.75),
+        color: 'rgba(255,255,255,0.75)',
         ...typography('Body', 200, 'Regular'),
-        textAlign: 'center',
+        textAlign: 'center' as const,
     },
     successTitle: {
-        color: theme.centerChannelColor,
+        color: '#FFFFFF',
         marginTop: 24,
         marginBottom: 12,
         ...typography('Heading', 1000),
+    },
+    returnButtonContainer: {
+        marginTop: 32,
     },
 }));
 
@@ -106,8 +164,17 @@ const ForgotPassword = ({componentId, serverUrl, theme}: Props) => {
     const {formatMessage} = useIntl();
     const keyboardAwareRef = useRef<KeyboardAwareScrollView>(null);
     const styles = getStyleSheet(theme);
+    const isTablet = useIsTablet();
 
-    const animatedStyles = useScreenTransitionAnimation(componentId);
+    useEffect(() => {
+        Navigation.mergeOptions(componentId, {
+            topBar: {
+                backButton: {
+                    color: '#FFFFFF',
+                },
+            },
+        });
+    }, [componentId]);
 
     useAvoidKeyboard(keyboardAwareRef);
 
@@ -144,14 +211,26 @@ const ForgotPassword = ({componentId, serverUrl, theme}: Props) => {
         }));
     }, [email, formatMessage, serverUrl]);
 
-    const getCenterContent = () => {
-        if (isPasswordLinkSent) {
-            return (
-                <View
-                    style={styles.successContainer}
-                    testID={'password_send.link.sent'}
-                    nativeID={SecurityManager.getShieldScreenId(componentId, false, true)}
-                >
+    useAndroidHardwareBackHandler(componentId, onReturn);
+
+    if (isPasswordLinkSent) {
+        return (
+            <View
+                style={styles.outerContainer}
+                testID='password_send.link.sent'
+                nativeID={SecurityManager.getShieldScreenId(componentId, false, true)}
+            >
+                <StatusBar
+                    barStyle='light-content'
+                    backgroundColor='transparent'
+                    translucent={true}
+                />
+                <Image
+                    source={backgroundLogin}
+                    style={styles.backgroundImage}
+                    resizeMode='cover'
+                />
+                <View style={styles.successContainer}>
                     <Inbox theme={theme}/>
                     <FormattedText
                         style={styles.successTitle}
@@ -173,41 +252,64 @@ const ForgotPassword = ({componentId, serverUrl, theme}: Props) => {
                             size='lg'
                             theme={theme}
                             text={formatMessage({id: 'password_send.return', defaultMessage: 'Return to Log In'})}
+                            backgroundStyle={styles.loginButton}
+                            textStyle={styles.loginButtonText}
                         />
                     </View>
                 </View>
-            );
-        }
+            </View>
+        );
+    }
 
-        return (
+    return (
+        <View
+            style={styles.outerContainer}
+            testID='forgot.password.screen'
+            nativeID={SecurityManager.getShieldScreenId(componentId, false, true)}
+        >
+            <StatusBar
+                barStyle='light-content'
+                backgroundColor='transparent'
+                translucent={true}
+            />
+            <Image
+                source={backgroundLogin}
+                style={styles.backgroundImage}
+                resizeMode='cover'
+            />
             <KeyboardAwareScrollView
-                bounces={false}
-                contentContainerStyle={styles.innerContainer}
-                enableAutomaticScroll={false}
-                enableOnAndroid={false}
+                bounces={true}
+                enableAutomaticScroll={true}
+                enableOnAndroid={true}
                 enableResetScrollToCoords={true}
-                extraScrollHeight={0}
+                extraScrollHeight={20}
                 keyboardDismissMode='on-drag'
                 keyboardShouldPersistTaps='handled'
                 ref={keyboardAwareRef}
-                scrollToOverflowEnabled={true}
                 style={styles.flex}
-                nativeID={SecurityManager.getShieldScreenId(componentId, false, true)}
+                contentContainerStyle={{flexGrow: 1}}
             >
-                <View
-                    style={styles.centered}
-                    testID={'password_send.link.prepare'}
-                >
+                {/* Dark top section with logo */}
+                <View style={[styles.topSection, isTablet && styles.topSectionTablet]}>
+                    <Image
+                        source={oktelLogo}
+                        style={[styles.logo, isTablet && styles.logoTablet]}
+                        resizeMode='contain'
+                    />
                     <FormattedText
                         {...messages.reset}
                         testID='password_send.reset'
-                        style={styles.header}
+                        style={styles.title}
                     />
                     <FormattedText
-                        style={styles.subheader}
+                        style={styles.subtitle}
                         id='password_send.description'
                         defaultMessage='To reset your password, enter the email address you used to sign up'
                     />
+                </View>
+
+                {/* White card with form */}
+                <View style={[styles.whiteCard, isTablet && styles.whiteCardTablet]}>
                     <View style={styles.form}>
                         <FloatingTextInput
                             rawInput={true}
@@ -224,7 +326,7 @@ const ForgotPassword = ({componentId, serverUrl, theme}: Props) => {
                             theme={theme}
                             value={email}
                         />
-                        <View style={styles.returnButtonContainer}>
+                        <View style={styles.buttonContainer}>
                             <Button
                                 testID='forgot.password.button'
                                 disabled={!email}
@@ -232,25 +334,13 @@ const ForgotPassword = ({componentId, serverUrl, theme}: Props) => {
                                 size='lg'
                                 text={formatMessage(messages.reset)}
                                 theme={theme}
+                                backgroundStyle={!email ? styles.loginButtonDisabled : styles.loginButton}
+                                textStyle={styles.loginButtonText}
                             />
                         </View>
                     </View>
                 </View>
             </KeyboardAwareScrollView>
-        );
-    };
-
-    useAndroidHardwareBackHandler(componentId, onReturn);
-
-    return (
-        <View style={styles.flex}>
-            <Background theme={theme}/>
-            <AnimatedSafeArea
-                testID='forgot.password.screen'
-                style={[styles.container, animatedStyles]}
-            >
-                {getCenterContent()}
-            </AnimatedSafeArea>
         </View>
     );
 };
