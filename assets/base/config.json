@@ -3,7 +3,7 @@
     "AuthUrlSchemeDev": "mmauthbeta://",
     "DefaultServerUrl": "https://oktel.io",
     "DefaultServerName": "Oktel",
-    "TestServerUrl": "https://oktel.io",
+    "TestServerUrl": "https://oktel.io", 
     "AutoSelectServerUrl": true,
 
     "WebsiteURL": "https://mattermost.com",

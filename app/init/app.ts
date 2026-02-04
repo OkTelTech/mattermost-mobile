@@ -1,6 +1,9 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
+import {Platform} from 'react-native';
+import {check, request, PERMISSIONS, RESULTS} from 'react-native-permissions';
+
 import {CallsManager} from '@calls/calls_manager';
 import DatabaseManager from '@database/manager';
 import {getAllServerCredentials} from '@init/credentials';
@@ -54,6 +57,21 @@ export async function initialize() {
     }
 }
 
+async function requestTrackingTransparency() {
+    if (Platform.OS !== 'ios') {
+        return;
+    }
+
+    try {
+        const status = await check(PERMISSIONS.IOS.APP_TRACKING_TRANSPARENCY);
+        if (status === RESULTS.DENIED) {
+            await request(PERMISSIONS.IOS.APP_TRACKING_TRANSPARENCY);
+        }
+    } catch {
+        // Non-critical — don't block app startup
+    }
+}
+
 export async function start() {
     // Clean relevant information on ephemeral stores
     NavigationStore.reset();
@@ -63,6 +81,7 @@ export async function start() {
     await initialize();
 
     PushNotifications.init(serverCredentials.length > 0);
+    await requestTrackingTransparency();
 
     registerNavigationListeners();
     registerScreens();

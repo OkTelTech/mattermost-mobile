@@ -19,6 +19,7 @@ Pod::UI.puts "Configuring Pod with statically linked Frameworks".green
 use_frameworks! :linkage => :static
 
 setup_permissions([
+  "AppTrackingTransparency",
   "Camera",
   "Microphone",
   "Notifications",
