@@ -1,10 +1,16 @@
 {
-  "about.teamEditiont1": "Enpresarako Bertsioa",
-  "about.teamEditionLearn": "Batu Mattermost komunetateari hemen ",
-  "about.enterpriseEditione1": "Enpresarako Bertsioa",
-  "about.hashee": "EE Konpilazioaren batuketa:",
-  "about.hash": "Konpilazioaren egiaztatze batuketa:",
-  "about.enterpriseEditionSt": "Komunikazio modernoa zure suebakiaren atzetik.",
+  "about.date": "Konpilatze data:",
   "about.enterpriseEditionLearn": "Enpresarako bertsioari buruz informazio gehiago hemen ",
-  "about.date": "Konpilatze data:"
+  "about.enterpriseEditionSt": "Komunikazio modernoa zure suebakiaren atzetik.",
+  "about.enterpriseEditione1": "Enpresarako Bertsioa",
+  "about.hash": "Konpilazioaren egiaztatze batuketa:",
+  "about.hashee": "EE Konpilazioaren batuketa:",
+  "about.teamEditionLearn": "Batu Mattermost komunetateari hemen ",
+  "about.teamEditiont1": "Enpresarako Bertsioa",
+  "mobile.voice_message.error_start": "Failed to start recording. Please try again.",
+  "mobile.voice_message.error_title": "Recording Error",
+  "mobile.voice_message.permission_denied_description": "To send voice messages, allow microphone access in Settings.",
+  "mobile.voice_message.permission_denied_title": "Microphone access required",
+  "mobile.voice_message.recording": "Recording...",
+  "mobile.voice_message.title": "Voice message"
 }

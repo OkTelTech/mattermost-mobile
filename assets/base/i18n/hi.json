@@ -179,6 +179,12 @@
   "mobile.post.cancel": "रद्द करना",
   "mobile.post_textbox.entire_channel.cancel": "रद्द करना",
   "mobile.reset_status.alert_cancel": "रद्द करना",
+  "mobile.voice_message.error_start": "रिकॉर्डिंग शुरू करने में विफल। कृपया पुनः प्रयास करें।",
+  "mobile.voice_message.error_title": "रिकॉर्डिंग त्रुटि",
+  "mobile.voice_message.permission_denied_description": "वॉइस संदेश भेजने के लिए, सेटिंग्स में माइक्रोफ़ोन एक्सेस की अनुमति दें।",
+  "mobile.voice_message.permission_denied_title": "माइक्रोफ़ोन एक्सेस आवश्यक",
+  "mobile.voice_message.recording": "रिकॉर्डिंग...",
+  "mobile.voice_message.title": "वॉइस संदेश",
   "post_info.del": "हटाएं",
   "user.settings.general.email": "ईमेल",
   "user.settings.general.username": "उपयोगकर्ता नाम"

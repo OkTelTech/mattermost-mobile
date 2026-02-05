@@ -25,7 +25,7 @@ const REACTION_TIMEOUT = 10000;
 const REACTION_LIMIT = 20;
 const CALL_QUALITY_RESET_MS = toMilliseconds({minutes: 1});
 const CAPTION_TIMEOUT = 5000;
-const RING_LENGTH = 30000;
+const RING_LENGTH = 60000;
 
 export enum Ringtone {
     Calm = 'Calm',

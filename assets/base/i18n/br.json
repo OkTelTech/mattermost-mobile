@@ -1,8 +1,14 @@
 {
-  "about.teamEditionLearn": "Kejañ ouzh kumuniezh Mattermost e ",
-  "about.enterpriseEditionSt": "Kehentiñ arnevez a-dreñv ho tanvoger.",
-  "about.enterpriseEditionLearn": "ouzout hiroc'h a-zivout ar stumm evit an embregerezhioù e ",
-  "about.enterpriseEditione1": "Stumm evit an embregerezhioù",
   "about.date": "Deiziad kempunañ:",
-  "about.teamEditiont1": "Stumm evit an embregerezhioù"
+  "about.enterpriseEditionLearn": "ouzout hiroc'h a-zivout ar stumm evit an embregerezhioù e ",
+  "about.enterpriseEditionSt": "Kehentiñ arnevez a-dreñv ho tanvoger.",
+  "about.enterpriseEditione1": "Stumm evit an embregerezhioù",
+  "about.teamEditionLearn": "Kejañ ouzh kumuniezh Mattermost e ",
+  "about.teamEditiont1": "Stumm evit an embregerezhioù",
+  "mobile.voice_message.error_start": "Failed to start recording. Please try again.",
+  "mobile.voice_message.error_title": "Recording Error",
+  "mobile.voice_message.permission_denied_description": "To send voice messages, allow microphone access in Settings.",
+  "mobile.voice_message.permission_denied_title": "Microphone access required",
+  "mobile.voice_message.recording": "Recording...",
+  "mobile.voice_message.title": "Voice message"
 }

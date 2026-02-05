@@ -62,5 +62,11 @@
   "mobile.server_url.invalid_format": "URL skal starte med http:// eller https://",
   "mobile.suggestion.members": "Medlemmer",
   "mobile.tos_link": "Betingelser for brug",
+  "mobile.voice_message.error_start": "Kunne ikke starte optagelse. Prøv venligst igen.",
+  "mobile.voice_message.error_title": "Optagelsesfejl",
+  "mobile.voice_message.permission_denied_description": "For at sende talebeskeder skal du tillade mikrofonadgang i Indstillinger.",
+  "mobile.voice_message.permission_denied_title": "Mikrofonadgang påkrævet",
+  "mobile.voice_message.recording": "Optager...",
+  "mobile.voice_message.title": "Talebesked",
   "post_body.check_for_out_of_channel_mentions.link.and": " og "
 }

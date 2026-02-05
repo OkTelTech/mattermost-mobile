@@ -37,5 +37,11 @@
   "last_users_message.left_channel.type": "**ออกจากห้องแล้ว**.",
   "last_users_message.left_team.type": "**ออกจากทีมแล้ว**.",
   "last_users_message.removed_from_channel.type": "ถูก **ลบออกจากห้องนี้แล้ว**.",
-  "last_users_message.removed_from_team.type": "ถูก **ลบออกจากทีมนี้แล้ว**."
+  "last_users_message.removed_from_team.type": "ถูก **ลบออกจากทีมนี้แล้ว**.",
+  "mobile.voice_message.error_start": "ไม่สามารถเริ่มบันทึกได้ กรุณาลองอีกครั้ง",
+  "mobile.voice_message.error_title": "ข้อผิดพลาดในการบันทึก",
+  "mobile.voice_message.permission_denied_description": "หากต้องการส่งข้อความเสียง ให้อนุญาตการเข้าถึงไมโครโฟนในการตั้งค่า",
+  "mobile.voice_message.permission_denied_title": "ต้องการสิทธิ์เข้าถึงไมโครโฟน",
+  "mobile.voice_message.recording": "กำลังบันทึก...",
+  "mobile.voice_message.title": "ข้อความเสียง"
 }

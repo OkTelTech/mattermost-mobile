@@ -45,5 +45,11 @@
   "mobile.custom_list.no_results": "אין תוצאות",
   "mobile.custom_status.choose_emoji": "תבחר אימוג'י",
   "mobile.custom_status.clear_after": "נקה אחרי",
+  "mobile.voice_message.error_start": "לא ניתן להתחיל הקלטה. אנא נסה שוב.",
+  "mobile.voice_message.error_title": "שגיאת הקלטה",
+  "mobile.voice_message.permission_denied_description": "כדי לשלוח הודעות קוליות, אפשר גישה למיקרופון בהגדרות.",
+  "mobile.voice_message.permission_denied_title": "נדרשת גישה למיקרופון",
+  "mobile.voice_message.recording": "מקליט...",
+  "mobile.voice_message.title": "הודעה קולית",
   "your.servers": "השרתים שלך"
 }

@@ -1,1 +1,8 @@
-{}
+{
+  "mobile.voice_message.error_start": "Failed to start recording. Please try again.",
+  "mobile.voice_message.error_title": "Recording Error",
+  "mobile.voice_message.permission_denied_description": "To send voice messages, allow microphone access in Settings.",
+  "mobile.voice_message.permission_denied_title": "Microphone access required",
+  "mobile.voice_message.recording": "Recording...",
+  "mobile.voice_message.title": "Voice message"
+}

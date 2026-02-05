@@ -1,1 +1,8 @@
-{}
+{
+  "mobile.voice_message.error_start": "Failed to start recordin'. Try again, ye scallywag!",
+  "mobile.voice_message.error_title": "Recordin' Error, Arr!",
+  "mobile.voice_message.permission_denied_description": "To send voice messages, allow microphone access in yer Settings, matey.",
+  "mobile.voice_message.permission_denied_title": "Microphone access be required!",
+  "mobile.voice_message.recording": "Recordin' yer voice...",
+  "mobile.voice_message.title": "Voice Message from the Sea"
+}

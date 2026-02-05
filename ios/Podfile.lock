@@ -1834,6 +1834,8 @@ PODS:
     - React-CoreModules
     - React-RCTImage
     - React-RCTText
+  - RNAudioRecorderPlayer (3.6.8):
+    - React-Core
   - RNCClipboard (1.16.2):
     - React-Core
   - RNDateTimePicker (8.3.0):
@@ -2285,6 +2287,7 @@ DEPENDENCIES:
   - ReactNativeExceptionHandler (from `../node_modules/react-native-exception-handler`)
   - ReactNativeIncallManager (from `../node_modules/react-native-incall-manager`)
   - ReactNativeNavigation (from `../node_modules/react-native-navigation`)
+  - RNAudioRecorderPlayer (from `../node_modules/react-native-audio-recorder-player`)
   - "RNCClipboard (from `../node_modules/@react-native-clipboard/clipboard`)"
   - "RNDateTimePicker (from `../node_modules/@react-native-community/datetimepicker`)"
   - RNFileViewer (from `../node_modules/react-native-file-viewer`)
@@ -2525,6 +2528,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-incall-manager"
   ReactNativeNavigation:
     :path: "../node_modules/react-native-navigation"
+  RNAudioRecorderPlayer:
+    :path: "../node_modules/react-native-audio-recorder-player"
   RNCClipboard:
     :path: "../node_modules/@react-native-clipboard/clipboard"
   RNDateTimePicker:
@@ -2680,6 +2685,7 @@ SPEC CHECKSUMS:
   ReactNativeExceptionHandler: a23922ca00122b050ae9412f960061791c232c47
   ReactNativeIncallManager: ef7b845e166f04cf8ddf433d8a23227b01cef87a
   ReactNativeNavigation: 6cef83673a08a51d426ff041c015da7c2a178a77
+  RNAudioRecorderPlayer: e8899f1813ae680999023a104dff2f2ecb261d0a
   RNCClipboard: e1d17c9d093d8129ef50b39b63a17a0e8ccd0ade
   RNDateTimePicker: 29264364ea7b8cc0fb355b3843cf276a4ff78966
   RNFileViewer: 4b5d83358214347e4ab2d4ca8d5c1c90d869e251
@@ -2687,7 +2693,7 @@ SPEC CHECKSUMS:
   RNGestureHandler: d167eaaa871650f856883d2e7841607e4873a124
   RNKeychain: 654353c6e4cb729d187e1444bccec0924c1dda9f
   RNLocalize: 15463c4d79c7da45230064b4adcf5e9bb984667e
-  RNPermissions: 84ae3e68efdd6d4a5142c8969df11869bfb06fa8
+  RNPermissions: a7c70eb08f8985e848b03bdc1a5483f3faa222f7
   RNReactNativeHapticFeedback: 92bb48cffe0a8738a109d66cdb5984732b9cb496
   RNReanimated: 436a2593b58dbce3abd695a54eebaac0413c7191
   RNScreens: 661aef92de15fa9e6ab205ebcddcd1298e720371
@@ -2709,6 +2715,6 @@ SPEC CHECKSUMS:
   WatermelonDB: 4c846c8cb94eef3cba90fa034d15310163226703
   Yoga: 2b02f3f767761bb4ffd25b1bb56fd264be57bd6b
 
-PODFILE CHECKSUM: 6c4ca8922ebba245d14c717b0a7063d2bd56acad
+PODFILE CHECKSUM: 6eb806c37bcea8fc08a58753e729383c72e16dbe
 
 COCOAPODS: 1.16.1

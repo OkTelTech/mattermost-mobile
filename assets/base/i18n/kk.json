@@ -8,5 +8,11 @@
   "about.teamEditionLearn": "Mattermost қауымына қосылыныз ",
   "about.teamEditionSt": "Команда арасындағы барлық байланыс шұғыл ізделетін және кез келген жерден қол жетімді бірыңғай жерде жинақталған.",
   "about.teamEditiont0": "Команда басылымы",
-  "about.teamEditiont1": "Кәсіпорын басылымы"
+  "about.teamEditiont1": "Кәсіпорын басылымы",
+  "mobile.voice_message.error_start": "Failed to start recording. Please try again.",
+  "mobile.voice_message.error_title": "Recording Error",
+  "mobile.voice_message.permission_denied_description": "To send voice messages, allow microphone access in Settings.",
+  "mobile.voice_message.permission_denied_title": "Microphone access required",
+  "mobile.voice_message.recording": "Recording...",
+  "mobile.voice_message.title": "Voice message"
 }

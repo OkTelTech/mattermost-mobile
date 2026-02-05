@@ -1,12 +1,18 @@
 {
-    "about.teamEditiont1": "Enterprise Edition",
-    "about.teamEditiont0": "Team Edition",
-    "about.teamEditionSt": "Sizdiŋ teiminizdiŋ barlık baylanıstarı bir jerde, lezde izdelinedi jäne ärjerden koljetimdi.",
-    "about.teamEditionLearn": "Mattermost kauımına kosılınız ",
-    "about.hashee": "EE Build Hash:",
-    "about.hash": "Build Hash:",
-    "about.enterpriseEditionSt": "Sizdiŋ Firewall'dıŋ arjagındagı zamanaui baylanıs.",
-    "about.enterpriseEditionLearn": "Enterprise Edition turalı köbirek biliniz ",
-    "about.enterpriseEditione1": "Enterprise Edition",
-    "about.date": "Build küni:"
+  "about.date": "Build küni:",
+  "about.enterpriseEditionLearn": "Enterprise Edition turalı köbirek biliniz ",
+  "about.enterpriseEditionSt": "Sizdiŋ Firewall'dıŋ arjagındagı zamanaui baylanıs.",
+  "about.enterpriseEditione1": "Enterprise Edition",
+  "about.hash": "Build Hash:",
+  "about.hashee": "EE Build Hash:",
+  "about.teamEditionLearn": "Mattermost kauımına kosılınız ",
+  "about.teamEditionSt": "Sizdiŋ teiminizdiŋ barlık baylanıstarı bir jerde, lezde izdelinedi jäne ärjerden koljetimdi.",
+  "about.teamEditiont0": "Team Edition",
+  "about.teamEditiont1": "Enterprise Edition",
+  "mobile.voice_message.error_start": "Failed to start recording. Please try again.",
+  "mobile.voice_message.error_title": "Recording Error",
+  "mobile.voice_message.permission_denied_description": "To send voice messages, allow microphone access in Settings.",
+  "mobile.voice_message.permission_denied_title": "Microphone access required",
+  "mobile.voice_message.recording": "Recording...",
+  "mobile.voice_message.title": "Voice message"
 }

@@ -167,5 +167,11 @@
   "channel_modal.descriptionHelp": "Jelaskan bagaimana saluran ini harus digunakan.",
   "channel_modal.name": "Nama",
   "channel_modal.purpose": "Tujuan",
-  "channel_modal.purposeEx": "Misalnya: \"Saluran untuk mengajukan bug dan peningkatan\""
+  "channel_modal.purposeEx": "Misalnya: \"Saluran untuk mengajukan bug dan peningkatan\"",
+  "mobile.voice_message.error_start": "Gagal memulai perekaman. Silakan coba lagi.",
+  "mobile.voice_message.error_title": "Kesalahan Perekaman",
+  "mobile.voice_message.permission_denied_description": "Untuk mengirim pesan suara, izinkan akses mikrofon di Pengaturan.",
+  "mobile.voice_message.permission_denied_title": "Akses mikrofon diperlukan",
+  "mobile.voice_message.recording": "Merekam...",
+  "mobile.voice_message.title": "Pesan suara"
 }

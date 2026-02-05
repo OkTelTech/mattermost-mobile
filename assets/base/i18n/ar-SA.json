@@ -1,1 +1,8 @@
-{}
+{
+  "mobile.voice_message.error_start": "فشل بدء التسجيل. يرجى المحاولة مرة أخرى.",
+  "mobile.voice_message.error_title": "خطأ في التسجيل",
+  "mobile.voice_message.permission_denied_description": "لإرسال الرسائل الصوتية، اسمح بالوصول إلى الميكروفون في الإعدادات.",
+  "mobile.voice_message.permission_denied_title": "مطلوب إذن الوصول إلى الميكروفون",
+  "mobile.voice_message.recording": "جارٍ التسجيل...",
+  "mobile.voice_message.title": "رسالة صوتية"
+}

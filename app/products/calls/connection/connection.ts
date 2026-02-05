@@ -27,7 +27,7 @@ import {WebSocketClient, wsReconnectionTimeoutErr} from './websocket_client';
 
 import type {EmojiData} from '@mattermost/calls/lib/types';
 
-const peerConnectTimeout = 5000;
+const peerConnectTimeout = 20000;
 const rtcMonitorInterval = 10000;
 
 const InCallManagerEmitter = new NativeEventEmitter(NativeModules.InCallManager);

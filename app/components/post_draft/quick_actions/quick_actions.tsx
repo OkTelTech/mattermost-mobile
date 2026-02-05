@@ -9,6 +9,7 @@ import FileAction from './file_quick_action';
 import ImageAction from './image_quick_action';
 import InputAction from './input_quick_action';
 import PostPriorityAction from './post_priority_action';
+import VoiceAction from './voice_quick_action';
 
 type Props = {
     testID?: string;
@@ -61,6 +62,7 @@ export default function QuickActions({
     const fileActionTestID = `${testID}.file_action`;
     const imageActionTestID = `${testID}.image_action`;
     const cameraActionTestID = `${testID}.camera_action`;
+    const voiceActionTestID = `${testID}.voice_action`;
     const postPriorityActionTestID = `${testID}.post_priority_action`;
 
     const uploadProps = {
@@ -102,6 +104,10 @@ export default function QuickActions({
             />
             <CameraAction
                 testID={cameraActionTestID}
+                {...uploadProps}
+            />
+            <VoiceAction
+                testID={voiceActionTestID}
                 {...uploadProps}
             />
             {isPostPriorityEnabled && canShowPostPriority && (
