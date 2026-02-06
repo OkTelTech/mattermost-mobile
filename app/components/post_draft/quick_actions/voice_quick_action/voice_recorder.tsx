@@ -174,7 +174,11 @@ export default function VoiceRecorder({onUploadFiles}: Props) {
         try {
             const {recorder, audioSet} = await getRecorder();
             const fileName = `voice_message_${Date.now()}.m4a`;
-            const androidDir = cacheDirectory || documentDirectory || '';
+            let androidDir = cacheDirectory || documentDirectory || '';
+            // Remove file:// prefix for Android - the recorder expects a raw path
+            if (androidDir.startsWith('file://')) {
+                androidDir = androidDir.replace('file://', '');
+            }
             const path = Platform.select({
                 ios: fileName,
                 android: `${androidDir}${fileName}`,
