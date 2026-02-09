@@ -127,14 +127,14 @@ class ShareViewController: UIViewController {
           files: files,
           completionHandler: { [weak self] in
             self?.removeObservers()
-            self?.extensionContext!.completeRequest(returningItems: [])
+            self?.extensionContext?.completeRequest(returningItems: [])
           })
         if uploadError != nil {
           NotificationCenter.default.post(name: Notification.Name("errorPosting"), object: nil, userInfo: ["info": uploadError as Any])
         }
       } else {
         removeObservers()
-        extensionContext!.completeRequest(returningItems: [])
+        extensionContext?.completeRequest(returningItems: [])
       }
     }
   }

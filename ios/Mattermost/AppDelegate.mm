@@ -1,6 +1,7 @@
 #import "AppDelegate.h"
 
 #import <AVFoundation/AVFoundation.h>
+#import <Firebase.h>
 
 #import <React/RCTBundleURLProvider.h>
 #import <React/RCTLinkingManager.h>
@@ -45,6 +46,9 @@ NSString* const NOTIFICATION_TEST_ACTION = @"test";
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+  // Initialize Firebase
+  [FIRApp configure];
+
   NSString *appGroupId = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"AppGroupIdentifier"];
   NSURL *containerURL = [[NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier:appGroupId];
   containerURL = [containerURL URLByAppendingPathComponent:@"Logs"];

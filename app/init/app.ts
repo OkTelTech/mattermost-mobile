@@ -1,6 +1,7 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
+import crashlytics from '@react-native-firebase/crashlytics';
 import {Platform} from 'react-native';
 import {check, request, PERMISSIONS, RESULTS} from 'react-native-permissions';
 
@@ -43,6 +44,10 @@ Promise.allSettled = Promise.allSettled || (<T>(promises: Array<Promise<T>>) => 
 export async function initialize() {
     if (!baseAppInitialized) {
         baseAppInitialized = true;
+
+        // Initialize Firebase Crashlytics
+        crashlytics().setCrashlyticsCollectionEnabled(true);
+
         serverCredentials = await getAllServerCredentials();
         const serverUrls = serverCredentials.map((credential) => credential.serverUrl);
 

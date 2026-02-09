@@ -18,7 +18,9 @@ class LocalFileManager {
   
   init() {
     let filemgr = FileManager.default
-    let appGroupId = Bundle.main.infoDictionary!["AppGroupIdentifier"] as! String
+    guard let appGroupId = Bundle.main.infoDictionary?["AppGroupIdentifier"] as? String else {
+      return
+    }
     let containerUrl = filemgr.containerURL(forSecurityApplicationGroupIdentifier: appGroupId)
     if let url = containerUrl,
        let cacheURL = url.appendingPathComponent("Library", isDirectory: true) as URL? {
@@ -60,23 +62,24 @@ class LocalFileManager {
   func saveAttachment(url: URL, type: AttachmentType) -> AttachmentModel? {
     let fileMgr = FileManager.default
     let fileName = url.lastPathComponent
-    let tempFileURL = cacheURL?
-      .appendingPathComponent(fileName)
-    
+    guard let tempFileURL = cacheURL?.appendingPathComponent(fileName) else {
+      return nil
+    }
+
     do {
       if (tempFileURL != url) {
-        try? FileManager.default.removeItem(at: tempFileURL!)
-        try fileMgr.copyItem(at: url, to: tempFileURL!)
+        try? FileManager.default.removeItem(at: tempFileURL)
+        try fileMgr.copyItem(at: url, to: tempFileURL)
       }
-      
-      let attr = try fileMgr.attributesOfItem(atPath: (tempFileURL?.path)!) as NSDictionary
+
+      let attr = try fileMgr.attributesOfItem(atPath: tempFileURL.path) as NSDictionary
       let attachment = AttachmentModel(
         fileName: fileName,
         fileSize: Int64(attr.fileSize()),
-        fileUrl: tempFileURL!,
+        fileUrl: tempFileURL,
         type: type
       )
-      
+
       return attachment
     } catch {
       return nil
@@ -120,7 +123,7 @@ class LocalFileManager {
     var linkPreviewUrl: String? = nil
     var message: String? = nil
     
-    for item in inputItems as! [NSExtensionItem] {
+    for item in inputItems.compactMap({ $0 as? NSExtensionItem }) {
       guard let attachments = item.attachments else {continue}
       for itemProvider in attachments {
         if itemProvider.hasItemConformingToTypeIdentifier(UTType.movie.identifier) {

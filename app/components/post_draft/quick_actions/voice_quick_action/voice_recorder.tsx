@@ -1,10 +1,10 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
+import {cacheDirectory, documentDirectory} from 'expo-file-system';
 import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {useIntl} from 'react-intl';
 import {Alert, Platform, View, Text} from 'react-native';
-import {cacheDirectory, documentDirectory} from 'expo-file-system';
 
 import CompassIcon from '@components/compass_icon';
 import TouchableWithFeedback from '@components/touchable_with_feedback';
@@ -175,6 +175,7 @@ export default function VoiceRecorder({onUploadFiles}: Props) {
             const {recorder, audioSet} = await getRecorder();
             const fileName = `voice_message_${Date.now()}.m4a`;
             let androidDir = cacheDirectory || documentDirectory || '';
+
             // Remove file:// prefix for Android - the recorder expects a raw path
             if (androidDir.startsWith('file://')) {
                 androidDir = androidDir.replace('file://', '');
