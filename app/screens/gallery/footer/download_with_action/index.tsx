@@ -4,7 +4,7 @@
 import RNUtils from '@mattermost/rnutils';
 import {CameraRoll} from '@react-native-camera-roll/camera-roll';
 import {applicationName} from 'expo-application';
-import {deleteAsync} from 'expo-file-system';
+import {cacheDirectory, createDownloadResumable, deleteAsync, makeDirectoryAsync, type DownloadResumable} from 'expo-file-system';
 import React, {useEffect, useRef, useState} from 'react';
 import {useIntl} from 'react-intl';
 import {Platform, StyleSheet, Text, View} from 'react-native';
@@ -84,6 +84,7 @@ const DownloadWithAction = ({action, enableSecureFilePreview, item, onDownloadSu
     const [progress, setProgress] = useState(0);
     const mounted = useRef(false);
     const downloadPromise = useRef<ProgressPromise<ClientResponse>>();
+    const urlDownloadRef = useRef<DownloadResumable | null>(null);
 
     let title;
     let iconName;
@@ -132,10 +133,15 @@ const DownloadWithAction = ({action, enableSecureFilePreview, item, onDownloadSu
 
     const cancel = async () => {
         try {
-            downloadPromise.current?.cancel?.();
-            const path = getLocalFilePathFromFile(serverUrl, galleryItemToFileInfo(item));
-            downloadPromise.current = undefined;
-            await deleteAsync(path);
+            if (urlDownloadRef.current) {
+                await urlDownloadRef.current.cancelAsync();
+                urlDownloadRef.current = null;
+            } else {
+                downloadPromise.current?.cancel?.();
+                const path = getLocalFilePathFromFile(serverUrl, galleryItemToFileInfo(item));
+                downloadPromise.current = undefined;
+                await deleteAsync(path);
+            }
         } catch {
             // do nothing
         } finally {
@@ -261,8 +267,41 @@ const DownloadWithAction = ({action, enableSecureFilePreview, item, onDownloadSu
 
     const startDownload = async () => {
         try {
+            // Handle URL-based images (uid- ids = inline/external images not stored on Mattermost server)
+            if (item.id?.startsWith('uid')) {
+                const fileName = `${item.name || 'image'}-${Date.now()}`;
+                const localPath = `${cacheDirectory ?? ''}${fileName}`;
+
+                urlDownloadRef.current = createDownloadResumable(
+                    item.uri,
+                    localPath,
+                    {},
+                    (downloadProgress) => {
+                        if (downloadProgress.totalBytesExpectedToWrite > 0) {
+                            setProgress(
+                                (downloadProgress.totalBytesWritten / downloadProgress.totalBytesExpectedToWrite) * 100,
+                            );
+                        }
+                    },
+                );
+
+                const result = await urlDownloadRef.current.downloadAsync();
+                urlDownloadRef.current = null;
+                if (result?.uri && mounted.current) {
+                    const hasPermission = await hasWriteStoragePermission(intl);
+                    if (hasPermission) {
+                        await saveImageOrVideo(result.uri);
+                    }
+                } else if (mounted.current) {
+                    setError(intl.formatMessage({id: 'download.error', defaultMessage: 'Unable to download the file. Try again later'}));
+                }
+                return;
+            }
+
             const path = getLocalFilePathFromFile(serverUrl, galleryItemToFileInfo(item));
             if (path) {
+                const dirPath = path.substring(0, path.lastIndexOf('/'));
+                await makeDirectoryAsync(dirPath, {intermediates: true});
                 const exists = await fileExists(path);
                 let actionToExecute: (response: ClientResponse) => Promise<void>;
                 switch (action) {
@@ -300,7 +339,9 @@ const DownloadWithAction = ({action, enableSecureFilePreview, item, onDownloadSu
             }
         } catch (e) {
             logDebug('error on startDownload', getFullErrorMessage(e));
-            setShowToast(false);
+            if (mounted.current) {
+                setError(intl.formatMessage({id: 'download.error', defaultMessage: 'Unable to download the file. Try again later'}));
+            }
         }
     };
 

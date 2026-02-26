@@ -37,6 +37,10 @@ const GalleryScreen = ({componentId, galleryIdentifier, hideActions, initialInde
 
     const containerStyle = dim;
 
+    const handleDownload = useCallback(() => {
+        DeviceEventEmitter.emit(Events.GALLERY_ACTIONS, 'downloading');
+    }, []);
+
     const onClose = useCallback(() => {
         // We keep the un freeze here as we want
         // the screen to be visible when the gallery
@@ -88,6 +92,7 @@ const GalleryScreen = ({componentId, galleryIdentifier, hideActions, initialInde
             <Header
                 index={localIndex}
                 onClose={onClose}
+                onDownload={handleDownload}
                 style={headerStyles}
                 total={items.length}
             />

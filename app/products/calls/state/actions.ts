@@ -217,7 +217,10 @@ const getRingtoneOrNone = async (serverUrl: string) => {
             return 'none';
         }
 
-        const enabled = user.notifyProps?.calls_mobile_sound ? user.notifyProps.calls_mobile_sound === 'true' : user.notifyProps?.calls_desktop_sound === 'true';
+        // Default to ON: only disabled if explicitly set to 'false'
+        const mobileSound = user.notifyProps?.calls_mobile_sound;
+        const desktopSound = user.notifyProps?.calls_desktop_sound;
+        const enabled = mobileSound ? mobileSound === 'true' : (desktopSound ? desktopSound === 'true' : true);
         if (!enabled) {
             return 'none';
         }

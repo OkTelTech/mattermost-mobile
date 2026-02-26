@@ -17,6 +17,7 @@ import {typography} from '@utils/typography';
 type Props = {
     index: number;
     onClose: () => void;
+    onDownload: () => void;
     style: StyleProp<AnimatedStyle<ViewStyle>>;
     total: number;
 }
@@ -43,7 +44,7 @@ const styles = StyleSheet.create({
 const edges: Edge[] = [];
 const AnimatedSafeAreaView = Animated.createAnimatedComponent(SafeAreaView);
 
-const Header = ({index, onClose, style, total}: Props) => {
+const Header = ({index, onClose, onDownload, style, total}: Props) => {
     const insets = useSafeAreaInsets();
     const {width} = useWindowDimensions();
     const height = useDefaultHeaderHeight() - insets.top;
@@ -78,6 +79,16 @@ const Header = ({index, onClose, style, total}: Props) => {
                         values={titleValue}
                     />
                 </View>
+                <PressableOpacity
+                    onPress={onDownload}
+                    style={iconStyle}
+                >
+                    <CompassIcon
+                        color='white'
+                        name='download-outline'
+                        size={24}
+                    />
+                </PressableOpacity>
             </Animated.View>
         </AnimatedSafeAreaView>
     );
