@@ -42,11 +42,16 @@ const Content = ({isReplyPost, layoutWidth, location, post, theme, showPermalink
         type = contentType.app_bindings;
     }
 
+    const attachments = isMessageAttachmentArray(post.props?.attachments) ? post.props.attachments : [];
+
+    // Fallback: server may send props.attachments without setting metadata.embeds
+    if (!type && attachments.length) {
+        type = contentType.message_attachment;
+    }
+
     if (!type) {
         return null;
     }
-
-    const attachments = isMessageAttachmentArray(post.props?.attachments) ? post.props.attachments : [];
 
     switch (contentType[type]) {
         case contentType.image:

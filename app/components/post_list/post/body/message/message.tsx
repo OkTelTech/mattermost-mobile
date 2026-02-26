@@ -4,6 +4,7 @@
 import React, {useCallback, useMemo, useState} from 'react';
 import {type LayoutChangeEvent, ScrollView, useWindowDimensions, View} from 'react-native';
 import Animated from 'react-native-reanimated';
+import {useIntl} from 'react-intl';
 
 import Markdown from '@components/markdown';
 import {isChannelMentions} from '@components/markdown/channel_mention/channel_mention';
@@ -82,6 +83,26 @@ const Message = ({currentUser, isHighlightWithoutNotificationLicensed, highlight
     }, [maxHeight]);
     const onPress = () => setOpen(!open);
 
+    const intl = useIntl();
+    const resolvedMessage = useMemo(() => {
+        const messageKey = post.props?.message_key as string | undefined;
+        const messageData = post.props?.message_data as Record<string, string | number> | undefined;
+
+        // Bot posts may send just @mention in message and put the real content in
+        // props.message_key + props.message_data for client-side i18n rendering
+        if (messageKey && messageData && /^@\w+$/.test(post.message.trim())) {
+            const template = intl.formatMessage({id: messageKey, defaultMessage: post.message});
+            return template.replace(/\{\{\.(\w+)\}\}/g, (_, key: string) => {
+                const value = messageData[key];
+                if (key === 'Reason' && typeof value === 'string') {
+                    return intl.formatMessage({id: `attendance.break_reason.${value}`, defaultMessage: value});
+                }
+                return String(value ?? '');
+            });
+        }
+        return post.message;
+    }, [intl, post.message, post.props]);
+
     const channelMentions = useMemo(() => {
         return isChannelMentions(post.props?.channel_mentions) ? post.props.channel_mentions : {};
     }, [post.props?.channel_mentions]);
@@ -110,7 +131,7 @@ const Message = ({currentUser, isHighlightWithoutNotificationLicensed, highlight
                             layoutWidth={layoutWidth}
                             location={location}
                             postId={post.id}
-                            value={post.message}
+                            value={resolvedMessage}
                             mentionKeys={mentionKeys}
                             highlightKeys={highlightKeys}
                             searchPatterns={searchPatterns}
