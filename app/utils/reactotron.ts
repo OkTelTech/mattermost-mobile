@@ -66,7 +66,7 @@ export const logApiRequest = (
                 response: responseBody,
             },
             preview: `${status} ${url}`,
-            important: status >= 400,
+            important: status === 0 || status >= 400,
         });
     }
 };

@@ -23,10 +23,8 @@ import {GALLERY_FOOTER_HEIGHT} from '@constants/gallery';
 import {useServerUrl} from '@context/server';
 import {useTheme} from '@context/theme';
 import {alertFailedToOpenDocument, alertOnlyPDFSupported} from '@utils/document';
-import {getFullErrorMessage} from '@utils/errors';
 import {fileExists, getLocalFilePathFromFile, hasWriteStoragePermission, isPdf, pathWithPrefix} from '@utils/file';
 import {galleryItemToFileInfo} from '@utils/gallery';
-import {logDebug} from '@utils/log';
 import {previewPdf} from '@utils/navigation';
 import {typography} from '@utils/typography';
 
@@ -301,8 +299,19 @@ const DownloadWithAction = ({action, enableSecureFilePreview, item, onDownloadSu
             const path = getLocalFilePathFromFile(serverUrl, galleryItemToFileInfo(item));
             if (path) {
                 const dirPath = path.substring(0, path.lastIndexOf('/'));
-                await makeDirectoryAsync(dirPath, {intermediates: true});
-                const exists = await fileExists(path);
+                try {
+                    await makeDirectoryAsync(dirPath, {intermediates: true});
+                } catch {
+                    // makeDirectoryAsync not available when ExpoFileSystem native module is not linked.
+                    // The native network client download creates directories automatically.
+                }
+                let exists = false;
+                try {
+                    exists = await fileExists(path);
+                } catch {
+                    // fileExists (getInfoAsync) not available when ExpoFileSystem native module is not linked.
+                    // Default to false so we always attempt the download.
+                }
                 let actionToExecute: (response: ClientResponse) => Promise<void>;
                 switch (action) {
                     case 'sharing':
@@ -337,8 +346,7 @@ const DownloadWithAction = ({action, enableSecureFilePreview, item, onDownloadSu
                     downloadPromise.current?.progress?.(setProgress);
                 }
             }
-        } catch (e) {
-            logDebug('error on startDownload', getFullErrorMessage(e));
+        } catch {
             if (mounted.current) {
                 setError(intl.formatMessage({id: 'download.error', defaultMessage: 'Unable to download the file. Try again later'}));
             }

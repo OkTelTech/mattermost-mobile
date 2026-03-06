@@ -99,10 +99,24 @@ const rmdir = (path) => {
     fs.rmdirSync(path);
 };
 
+function copyDir(src, dest) {
+    fs.mkdirSync(dest, {recursive: true});
+    for (const file of fs.readdirSync(src)) {
+        const srcPath = fsPath.join(src, file);
+        const destPath = fsPath.join(dest, file);
+        if (fs.statSync(srcPath).isDirectory()) {
+            copyDir(srcPath, destPath);
+        } else {
+            console.log('Copying ' + srcPath + ' to ' + destPath);
+            fs.copyFileSync(srcPath, destPath);
+        }
+    }
+}
+
 if (fs.existsSync('dist')) {
     rmdir('dist');
 }
 
-// Assumes dist/assets exists and is empty
-leftMergeDirs('assets/base/', 'assets/override/', 'dist/assets/', '');
+// Copy base assets directly to dist/assets
+copyDir('assets/base', 'dist/assets');
 /* eslint-enable no-console */

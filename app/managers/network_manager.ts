@@ -23,7 +23,8 @@ import {CERTIFICATE_ERRORS} from '@constants/network';
 import ManagedApp from '@init/managed_app';
 import {toMilliseconds} from '@utils/datetime';
 import {getIntlShape} from '@utils/general';
-import {logDebug, logError} from '@utils/log';
+import {logDebug, logError, logInfo} from '@utils/log';
+import {logToReactotron} from '@utils/reactotron_api';
 import {getCSRFFromCookie} from '@utils/security';
 
 const CLIENT_CERTIFICATE_IMPORT_ERROR_CODES = [-103, -104, -105, -108];
@@ -108,6 +109,9 @@ class NetworkManagerSingleton {
 
             // Pass preauthSecret explicitly to constructor to match ClientBase behavior
             this.clients[serverUrl] = new Client(client, serverUrl, bearerToken, csrfToken, preauthSecret);
+            // eslint-disable-next-line no-console
+            console.log('[NetworkManager] API client created for:', serverUrl);
+            logToReactotron('🌐 API Client', {server: serverUrl});
         } catch (error) {
             throw new ClientError(serverUrl, {
                 message: 'Can’t find this server. Check spelling and URL format.',

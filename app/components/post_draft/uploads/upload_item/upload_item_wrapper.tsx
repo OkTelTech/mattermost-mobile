@@ -75,13 +75,12 @@ export default function UploadItemWrapper({
                 newFile,
                 channelId,
                 rootId,
-                newFile.bytesRead,
                 true, // isEditPost = true
                 updateFileCallback,
             );
         } else {
             updateDraftFile(serverUrl, channelId, rootId, newFile);
-            DraftEditPostUploadManager.prepareUpload(serverUrl, newFile, channelId, rootId, newFile.bytesRead);
+            DraftEditPostUploadManager.prepareUpload(serverUrl, newFile, channelId, rootId);
         }
 
         DraftEditPostUploadManager.registerProgressHandler(newFile.clientId!, setProgress);

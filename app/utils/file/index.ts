@@ -18,6 +18,23 @@ import {logError} from '@utils/log';
 import {deleteEntitiesFile, getIOSAppGroupDetails} from '@utils/mattermost_managed';
 import {urlSafeBase64Encode} from '@utils/security';
 
+// expo-file-system may not have its native module linked (ExpoFileSystem pod not installed).
+// When that happens, cacheDirectory is null. Use this helper to get a valid base path.
+function getFileCacheDirectory(): string {
+    if (cacheDirectory) {
+        return cacheDirectory;
+    }
+    if (Platform.OS === 'ios') {
+        try {
+            const {appGroupSharedDirectory} = getIOSAppGroupDetails();
+            return appGroupSharedDirectory.endsWith('/') ? appGroupSharedDirectory : `${appGroupSharedDirectory}/`;
+        } catch {
+            // fall through
+        }
+    }
+    return documentDirectory ?? '';
+}
+
 import type {PastedFile} from '@mattermost/react-native-paste-input';
 import type FileModel from '@typings/database/models/servers/file';
 import type {IntlShape} from 'react-intl';
@@ -281,7 +298,7 @@ export const isImage = (file?: FileInfo | FileModel) => {
         return true;
     }
 
-    const fileExt = extractExtension(file.extension || file.name);
+    const fileExt = extractExtension(file.extension || file.name || '');
 
     if (!SUPPORTED_IMAGE_FORMAT.includes(fileExt)) {
         return false;
@@ -427,11 +444,14 @@ export function getLocalFilePathFromFile(serverUrl: string, file: FileInfo | Fil
                 }
             }
 
-            return `${cacheDirectory}${server}/Files/${filename}-${fileIdPath}.${extension}`;
+            const baseDir = getFileCacheDirectory();
+            return `${baseDir}${server}/Files/${filename}-${fileIdPath}.${extension}`;
         } else if (file?.id && hasValidExtension) {
-            return `${cacheDirectory}${server}/Files/${fileIdPath}.${file.extension}`;
+            const baseDir = getFileCacheDirectory();
+            return `${baseDir}${server}/Files/${fileIdPath}.${file.extension}`;
         } else if (file?.id) {
-            return `${cacheDirectory}${server}/Files/${fileIdPath}`;
+            const baseDir = getFileCacheDirectory();
+            return `${baseDir}${server}/Files/${fileIdPath}`;
         }
     }
 

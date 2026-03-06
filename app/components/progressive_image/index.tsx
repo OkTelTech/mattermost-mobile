@@ -2,7 +2,7 @@
 // See LICENSE.txt for license information.
 
 import {type ImageContentFit, type ImageStyle} from 'expo-image';
-import React, {type ReactNode, useEffect, useState} from 'react';
+import React, {type ReactNode, useCallback} from 'react';
 import {type StyleProp, StyleSheet, View, type ViewStyle} from 'react-native';
 import Animated from 'react-native-reanimated';
 
@@ -11,6 +11,7 @@ import {changeOpacity, makeStyleSheetFromTheme} from '@utils/theme';
 
 type Props = ProgressiveImageProps & {
     children?: ReactNode | ReactNode[];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     forwardRef?: React.RefObject<any>;
     id: string;
     imageStyle?: StyleProp<ImageStyle>;
@@ -43,7 +44,6 @@ const ProgressiveImage = ({
     id,
     imageStyle,
     imageUri,
-    inViewPort,
     isBackgroundImage,
     onError,
     contentFit = 'contain',
@@ -52,14 +52,11 @@ const ProgressiveImage = ({
     tintDefaultSource,
     theme,
 }: Props) => {
-    const [showHighResImage, setShowHighResImage] = useState(false);
     const styles = getStyleSheet(theme);
 
-    useEffect(() => {
-        if (inViewPort) {
-            setShowHighResImage(inViewPort);
-        }
-    }, [inViewPort]);
+    const handleError = useCallback(() => {
+        onError();
+    }, [onError]);
 
     if (isBackgroundImage && imageUri) {
         return (
@@ -97,8 +94,6 @@ const ProgressiveImage = ({
         );
     }
 
-    const showImage = showHighResImage || !thumbnailUri;
-
     return (
         <Animated.View style={[styles.defaultImageContainer, style]}>
             <ExpoImage
@@ -111,8 +106,10 @@ const ProgressiveImage = ({
                 testID='progressive_image.highResImage'
                 transition={300}
                 style={[StyleSheet.absoluteFill, imageStyle]}
-                source={(showImage) ? {uri: imageUri} : undefined}
+                source={imageUri ? {uri: imageUri} : undefined}
+                contentFit={contentFit}
                 autoplay={true}
+                onError={handleError}
             />
         </Animated.View>
     );

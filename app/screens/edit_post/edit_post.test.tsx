@@ -198,7 +198,6 @@ describe('Edit Post', () => {
                 TEST_FILES.newFile,
                 baseProps.post.channelId,
                 baseProps.post.rootId,
-                0,
                 true,
                 expect.any(Function),
             );

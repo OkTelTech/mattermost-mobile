@@ -211,7 +211,6 @@ const EditPost = ({
                 file,
                 post.channelId,
                 post.rootId,
-                0,
                 true, // isEditPost = true
                 updateFileInPostFiles,
             );

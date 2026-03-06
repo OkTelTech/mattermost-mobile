@@ -357,8 +357,8 @@ export default class ClientTracking {
 
     doFetchWithTracking = async (url: string, options: ClientOptions, returnDataOnly = true) => {
         let request;
-        const {groupLabel} = options;
         const method = options.method?.toLowerCase();
+        const {groupLabel} = options;
         switch (method) {
             case 'get': request = this.apiClient!.get;
                 break;
@@ -392,6 +392,14 @@ export default class ClientTracking {
             response = await request!(url, this.buildRequestOptions(options));
         } catch (error) {
             NetworkPerformanceManager.cancelRequestTracking(this.apiClient.baseUrl, performanceRequestId);
+            logApiToReactotron(
+                method?.toUpperCase() || 'GET',
+                url,
+                0,
+                0,
+                options.body,
+                (error as Error)?.message || 'Network error',
+            );
             const response_error = error as ClientError;
             const status_code = isErrorWithStatusCode(error) ? error.status_code : undefined;
             throw new ClientError(this.apiClient.baseUrl, {

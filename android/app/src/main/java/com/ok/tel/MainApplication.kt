@@ -32,6 +32,7 @@ import com.wix.reactnativenotifications.core.notification.IPushNotification
 import expo.modules.ApplicationLifecycleDispatcher
 import expo.modules.ReactNativeHostWrapper
 import expo.modules.image.okhttp.ExpoImageOkHttpClientGlideModule
+import okhttp3.OkHttpClient
 import java.io.File
 
 class MainApplication : NavigationApplication(), INotificationsApplication {
@@ -77,7 +78,14 @@ class MainApplication : NavigationApplication(), INotificationsApplication {
         // with a cookie jar defined in APIClientModule and an interceptor to intercept all
         // requests that originate from React Native's OKHttpClient
         OkHttpClientProvider.setOkHttpClientFactory(RCTOkHttpClientFactory())
-        ExpoImageOkHttpClientGlideModule.okHttpClient = RCTOkHttpClientFactory().createNewNetworkModuleClient()
+        // expo-image uses this client for Glide image loading. We use a plain OkHttpClient
+        // (not RCTOkHttpClientFactory) because the factory's interceptors block HTTP 302 redirects
+        // that Mattermost file endpoints use to serve from CDN/GCS. Auth headers are injected
+        // per-request via ImageSource.headers in JS, so no custom factory is needed here.
+        ExpoImageOkHttpClientGlideModule.okHttpClient = OkHttpClient.Builder()
+            .followRedirects(true)
+            .followSslRedirects(true)
+            .build()
 
         SoLoader.init(this, OpenSourceMergedSoMapping)
         if (BuildConfig.IS_NEW_ARCHITECTURE_ENABLED) {

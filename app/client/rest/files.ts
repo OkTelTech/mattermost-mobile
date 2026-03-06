@@ -20,6 +20,8 @@ export interface ClientFilesMix {
         skipBytes?: number,
         isBookmark?: boolean,
     ) => () => void;
+    createUploadSession: (channelId: string, filename: string, fileSize: number) => Promise<{id: string; presigned_url: string}>;
+    completeUploadSession: (uploadId: string) => Promise<FileInfo>;
     searchFiles: (teamId: string, terms: string, isOrSearch: boolean) => Promise<FileSearchRequest>;
     searchFilesWithParams: (teamId: string, FileSearchParams: FileSearchParams) => Promise<FileSearchRequest>;
 }
@@ -90,6 +92,20 @@ const ClientFiles = <TBase extends Constructor<ClientBase>>(superclass: TBase) =
         const promise = this.apiClient.upload(url, file.localPath, options) as ProgressPromise<ClientResponse>;
         promise.progress!(onProgress).then(onComplete).catch(onError);
         return promise.cancel!;
+    };
+
+    createUploadSession = async (channelId: string, filename: string, fileSize: number) => {
+        return this.doFetch(
+            `${this.urlVersion}/uploads`,
+            {method: 'post', body: {channel_id: channelId, filename, file_size: fileSize}},
+        );
+    };
+
+    completeUploadSession = async (uploadId: string) => {
+        return this.doFetch(
+            `${this.urlVersion}/uploads/${uploadId}/complete`,
+            {method: 'post'},
+        );
     };
 
     searchFilesWithParams = async (teamId: string, params: FileSearchParams) => {

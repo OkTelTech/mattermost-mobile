@@ -8,7 +8,6 @@ import {Notifications} from 'react-native-notifications';
 import {removePost} from '@actions/local/post';
 import {switchToChannelById} from '@actions/remote/channel';
 import {appEntry, pushNotificationEntry, upgradeEntry} from '@actions/remote/entry';
-import {doPing} from '@actions/remote/general';
 import {fetchConfigAndLicense} from '@actions/remote/systems';
 import {fetchAndSwitchToThread} from '@actions/remote/thread';
 import LocalConfig from '@assets/config.json';
@@ -16,6 +15,7 @@ import {DeepLink, Events, Launch, PushNotification} from '@constants';
 import {PostTypes} from '@constants/post';
 import DatabaseManager from '@database/manager';
 import {getActiveServerUrl, getServerCredentials, removeServerCredentials} from '@init/credentials';
+import NetworkManager from '@managers/network_manager';
 import PerformanceMetricsManager from '@managers/performance_metrics_manager';
 import SecurityManager from '@managers/security_manager';
 import {getLastViewedChannelIdAndServer, getOnboardingViewed, getLastViewedThreadIdAndServer} from '@queries/app/global';
@@ -30,7 +30,7 @@ import {getLaunchPropsFromDeepLink, handleDeepLink} from '@utils/deep_link';
 import {logError, logInfo} from '@utils/log';
 import {loginOptions} from '@utils/server';
 import {convertToNotificationData} from '@utils/notification';
-import {removeProtocol, getServerUrlAfterRedirect, sanitizeUrl} from '@utils/url';
+import {removeProtocol, sanitizeUrl} from '@utils/url';
 
 import type {DeepLinkWithData, LaunchProps} from '@typings/launch';
 
@@ -200,33 +200,27 @@ const autoConnectToDefaultServer = async (props: LaunchProps): Promise<string> =
     const serverUrl = sanitizeUrl(LocalConfig.DefaultServerUrl);
     const serverDisplayName = LocalConfig.DefaultServerName || serverUrl;
 
+    // Create the API client (no ping required)
     try {
-        // Step 1: Check redirect and ping
-        const headRequest = await getServerUrlAfterRedirect(serverUrl, false);
-        if (!headRequest.url) {
-            logError('[autoConnect] Server URL redirect failed:', serverUrl);
-            showConnectionErrorAndExit();
-            return '';
-        }
+        await NetworkManager.createClient(serverUrl);
+    } catch (error) {
+        logError('[autoConnect] Failed to create client:', error);
+    }
 
-        const pingResult = await doPing(headRequest.url, true);
-        if (pingResult.error) {
-            logError('[autoConnect] Ping failed:', pingResult.error);
-            showConnectionErrorAndExit();
-            return '';
-        }
+    // Fetch config and license directly — skip ping
+    const data = await fetchConfigAndLicense(serverUrl, true);
 
-        // Step 2: Fetch config and license
-        const data = await fetchConfigAndLicense(headRequest.url, true);
-        if (data.error || !data.config?.DiagnosticId) {
-            logError('[autoConnect] fetchConfigAndLicense failed:', data.error);
-            showConnectionErrorAndExit();
-            return '';
-        }
+    let enabledSSOs: string[] = [];
+    let hasLoginForm = true;
+    let numberSSOs = 0;
+    let ssoOptions: SsoWithOptions = {};
+    let config = data.config ?? ({} as ClientConfig);
+    let license = data.license ?? ({} as ClientLicense);
 
-        // Step 3: Security checks
+    if (data.config && data.license) {
+        // Security checks
         if (data.config.MobileJailbreakProtection === 'true') {
-            const isJailbroken = await SecurityManager.isDeviceJailbroken(headRequest.url, data.config.SiteName);
+            const isJailbroken = await SecurityManager.isDeviceJailbroken(serverUrl, data.config.SiteName);
             if (isJailbroken) {
                 showConnectionErrorAndExit();
                 return '';
@@ -234,36 +228,33 @@ const autoConnectToDefaultServer = async (props: LaunchProps): Promise<string> =
         }
 
         if (data.config.MobileEnableBiometrics === 'true') {
-            const biometricsResult = await SecurityManager.authenticateWithBiometrics(headRequest.url, data.config.SiteName);
+            const biometricsResult = await SecurityManager.authenticateWithBiometrics(serverUrl, data.config.SiteName);
             if (!biometricsResult) {
                 showConnectionErrorAndExit();
                 return '';
             }
         }
 
-        // Step 4: Navigate directly to Login/SSO
-        const {enabledSSOs, hasLoginForm, numberSSOs, ssoOptions} = loginOptions(data.config, data.license!);
-
-        resetToLogin({
-            config: data.config,
-            enabledSSOs,
-            extra: props.extra,
-            hasLoginForm,
-            launchError: props.launchError,
-            launchType: props.launchType,
-            license: data.license!,
-            numberSSOs,
-            serverDisplayName,
-            serverUrl: headRequest.url,
-            ssoOptions,
-        });
-
-        return '';
-    } catch (error) {
-        logError('[autoConnect] Unexpected error:', error);
-        showConnectionErrorAndExit();
-        return '';
+        ({enabledSSOs, hasLoginForm, numberSSOs, ssoOptions} = loginOptions(data.config, data.license));
+    } else {
+        logError('[autoConnect] Could not fetch server config, proceeding to login with defaults');
     }
+
+    resetToLogin({
+        config,
+        enabledSSOs,
+        extra: props.extra,
+        hasLoginForm,
+        launchError: props.launchError,
+        launchType: props.launchType,
+        license,
+        numberSSOs,
+        serverDisplayName,
+        serverUrl,
+        ssoOptions,
+    });
+
+    return '';
 };
 
 export const launchToHome = async (props: LaunchProps) => {

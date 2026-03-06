@@ -11,7 +11,7 @@ import {getConfigValue} from '@queries/servers/system';
 import {hasReliableWebsocket} from '@utils/config';
 import {toMilliseconds} from '@utils/datetime';
 import {logDebug, logError, logInfo, logWarning} from '@utils/log';
-import {logWebSocketEvent} from '@utils/reactotron';
+import {logToReactotron, logWebSocketEvent} from '@utils/reactotron';
 
 const MAX_WEBSOCKET_FAILS = 7;
 const WEBSOCKET_TIMEOUT = toMilliseconds({seconds: 30});
@@ -89,6 +89,9 @@ export default class WebSocketClient {
             getConfigValue(database, 'EnableReliableWebSockets'),
         ]);
         const connectionUrl = (websocketUrl || this.serverUrl) + '/api/v4/websocket';
+        // eslint-disable-next-line no-console
+        console.log('[WebSocket] Connecting to:', connectionUrl);
+        logToReactotron('🔌 WebSocket', {url: connectionUrl});
 
         if (this.connectingCallback) {
             this.connectingCallback();

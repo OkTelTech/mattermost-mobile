@@ -6,8 +6,6 @@ import {AppState, type AppStateStatus} from 'react-native';
 import {updateDraftFile} from '@actions/local/draft';
 import {uploadFile} from '@actions/remote/file';
 import {PROGRESS_TIME_TO_STORE} from '@constants/files';
-import {getFullErrorMessage} from '@utils/errors';
-
 import type {ClientResponse, ClientResponseError} from '@mattermost/react-native-network-client';
 
 type FileHandler = {
@@ -39,7 +37,6 @@ class DraftEditPostUploadManagerSingleton {
         file: FileInfo,
         channelId: string,
         rootId: string,
-        skipBytes = 0,
         isEditPost = false,
         updateFileCallback?: (fileInfo: FileInfo) => void,
     ) => {
@@ -68,11 +65,7 @@ class DraftEditPostUploadManagerSingleton {
             this.handleError(message, file.clientId!);
         };
 
-        const {error, cancel} = uploadFile(serverUrl, file, channelId, onProgress, onComplete, onError, skipBytes);
-        if (error) {
-            this.handleError(getFullErrorMessage(error), file.clientId!);
-            return;
-        }
+        const {cancel} = uploadFile(serverUrl, file, channelId, onProgress, onComplete, onError);
         this.handlers[file.clientId!].cancel = cancel;
     };
 
@@ -137,7 +130,7 @@ class DraftEditPostUploadManagerSingleton {
         if (!h) {
             return;
         }
-        if (response.code !== 201) {
+        if (!response.ok) {
             this.handleError((response.data?.message as string | undefined) || 'Failed to upload the file: unknown error', clientId);
             return;
         }
@@ -145,15 +138,10 @@ class DraftEditPostUploadManagerSingleton {
             this.handleError('Failed to upload the file: no data received', clientId);
             return;
         }
-        const data = response.data.file_infos as FileInfo[] | undefined;
-        if (!data?.length) {
-            this.handleError('Failed to upload the file: no data received', clientId);
-            return;
-        }
 
         delete this.handlers[clientId];
 
-        const fileInfo = data[0];
+        const fileInfo = response.data as FileInfo;
         fileInfo.clientId = h.fileInfo.clientId;
         fileInfo.localPath = h.fileInfo.localPath;
 

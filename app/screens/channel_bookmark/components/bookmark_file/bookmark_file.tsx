@@ -187,24 +187,17 @@ const BookmarkFile = ({channelId, close, disabled, initialFile, maxFileSize, set
         setUploading(true);
         setProgress(0);
 
-        const {cancel, error: uploadError} = uploadFile(
+        const {cancel} = uploadFile(
             serverUrl,
             fileInfo,
             channelId,
             onProgress,
             onComplete,
             onError,
-            fileInfo.bytesRead,
-            true,
         );
 
         if (cancel) {
             cancelUpload.current = cancel;
-        }
-
-        if (uploadError) {
-            setUploadError();
-            cancelUpload.current?.();
         }
     }, [channelId, onProgress, onComplete, onError, serverUrl]);
 

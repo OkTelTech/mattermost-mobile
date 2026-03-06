@@ -1,0 +1,13 @@
+diff --git a/node_modules/@mattermost/react-native-network-client/ios/NetworkClient.swift b/node_modules/@mattermost/react-native-network-client/ios/NetworkClient.swift
+index 894935f..e1e6633 100644
+--- a/node_modules/@mattermost/react-native-network-client/ios/NetworkClient.swift
++++ b/node_modules/@mattermost/react-native-network-client/ios/NetworkClient.swift
+@@ -228,7 +228,7 @@ extension NetworkClient {
+                 data["metrics"] = metricsData
+             }
+ 
+-            if let redirectUrls = getRedirectUrls(for: request!) {
++            if let req = request, let redirectUrls = getRedirectUrls(for: req) {
+                 data["redirectUrls"] = redirectUrls
+             }
+             
