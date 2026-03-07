@@ -64,14 +64,17 @@ const Servers = React.forwardRef<ServersRef>((_, ref) => {
         const unreads = subscriptions.get(serverUrl);
         if (unreads) {
             let mentions = 0;
+            let totalMessages = 0;
             let unread = Boolean(threadUnreads);
             for (const myChannel of myChannels) {
                 const isMuted = settings?.[myChannel.id]?.mark_unread === 'mention';
                 mentions += isMuted ? 0 : myChannel.mentionsCount;
+                totalMessages += isMuted ? 0 : (myChannel.messageCount ?? 0);
                 unread = unread || (myChannel.isUnread && !isMuted);
             }
 
-            unreads.mentions = mentions + threadMentionCount;
+            const totalMentions = mentions + threadMentionCount;
+            unreads.mentions = totalMentions > 0 ? totalMentions : totalMessages;
             unreads.unread = unread;
             subscriptions.set(serverUrl, unreads);
             updateTotal();
@@ -165,8 +168,8 @@ const Servers = React.forwardRef<ServersRef>((_, ref) => {
             style={styles.icon}
             testID={'channel_list.servers.server_icon'}
             badgeBorderColor={theme.sidebarBg}
-            badgeBackgroundColor={theme.mentionBg}
-            badgeColor={theme.mentionColor}
+            badgeBackgroundColor={'#f74343'}
+            badgeColor={'#ffffff'}
         />
     );
 });

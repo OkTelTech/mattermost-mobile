@@ -1,9 +1,9 @@
 {
     "AuthUrlScheme": "mmauth://",
     "AuthUrlSchemeDev": "mmauthbeta://",
-    "DefaultServerUrl": "https://staging.oktel.io",
-    "DefaultServerName": "Oktel Staging",
-    "TestServerUrl": "https://staging.oktel.io",
+    "DefaultServerUrl": "https://oktel.io",
+    "DefaultServerName": "Oktel",
+    "TestServerUrl": "https://oktel.io",
     "AutoSelectServerUrl": true,
 
     "WebsiteURL": "https://mattermost.com",

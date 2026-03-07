@@ -161,17 +161,20 @@ const ServerItem = ({
         displayName = intl.formatMessage({id: 'servers.default', defaultMessage: 'Default Server'});
     }
 
-    const unreadsSubscription = ({myChannels, settings, threadMentionCount, threadUnreads}: UnreadObserverArgs) => {
+    const unreadsSubscriptionRef = useRef<(args: UnreadObserverArgs) => void>();
+    unreadsSubscriptionRef.current = ({myChannels, settings, threadMentionCount, threadUnreads}: UnreadObserverArgs) => {
         let mentions = 0;
+        let totalMessages = 0;
         let isUnread = Boolean(threadUnreads);
         for (const myChannel of myChannels) {
             const isMuted = settings?.[myChannel.id]?.mark_unread === 'mention';
             mentions += isMuted ? 0 : myChannel.mentionsCount;
+            totalMessages += isMuted ? 0 : (myChannel.messageCount ?? 0);
             isUnread = isUnread || (myChannel.isUnread && !isMuted);
         }
         mentions += threadMentionCount;
 
-        setBadge({isUnread, mentions});
+        setBadge({isUnread, mentions: mentions > 0 ? mentions : totalMessages});
     };
 
     const logoutServer = useCallback(async () => {
@@ -315,21 +318,19 @@ const ServerItem = ({
     }, [server]);
 
     useEffect(() => {
-        if (!isActive) {
-            if (server.lastActiveAt && !subscription.current) {
-                subscription.current = subscribeServerUnreadAndMentions(server.url, unreadsSubscription);
-            } else if (!server.lastActiveAt) {
-                subscription.current?.unsubscribe();
-                subscription.current = undefined;
-                setBadge({isUnread: false, mentions: 0});
-            }
+        if (server.lastActiveAt && !subscription.current) {
+            subscription.current = subscribeServerUnreadAndMentions(server.url, (args) => unreadsSubscriptionRef.current?.(args));
+        } else if (!server.lastActiveAt) {
+            subscription.current?.unsubscribe();
+            subscription.current = undefined;
+            setBadge({isUnread: false, mentions: 0});
         }
 
         return () => {
             subscription.current?.unsubscribe();
             subscription.current = undefined;
         };
-    }, [server.lastActiveAt, isActive]);
+    }, [server.lastActiveAt]);
 
     const serverItem = `server_list.server_item.${server.displayName.replace(/ /g, '_').toLocaleLowerCase()}`;
     const serverItemTestId = isActive ? `${serverItem}.active` : `${serverItem}.inactive`;
@@ -372,9 +373,9 @@ const ServerItem = ({
                         <View style={serverStyle}>
                             {!switching &&
                             <ServerIcon
-                                badgeBackgroundColor={theme.buttonBg}
+                                badgeBackgroundColor={'#f74343'}
                                 badgeBorderColor={theme.centerChannelBg}
-                                badgeColor={theme.buttonColor}
+                                badgeColor={'#ffffff'}
                                 badgeStyle={styles.badge}
                                 iconColor={changeOpacity(theme.centerChannelColor, 0.56)}
                                 hasUnreads={badge.isUnread}

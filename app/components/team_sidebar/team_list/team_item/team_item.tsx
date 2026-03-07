@@ -117,6 +117,8 @@ export default function TeamItem({team, hasUnreads, mentionCount, selected}: Pro
             </View>
             <Badge
                 borderColor={theme.sidebarHeaderBg}
+                backgroundColor={'#f74343'}
+                color={'#ffffff'}
                 visible={hasBadge && !selected}
                 style={badgeStyle}
                 value={value}

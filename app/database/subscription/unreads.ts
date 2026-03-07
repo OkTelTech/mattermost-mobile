@@ -38,7 +38,7 @@ export const subscribeServerUnreadAndMentions = (serverUrl: string, observer: Un
         subscription = server.database.
             get<MyChannelModel>(MY_CHANNEL).
             query(Q.on(CHANNEL, Q.where('delete_at', Q.eq(0)))).
-            observeWithColumns(['is_unread', 'mentions_count']).
+            observeWithColumns(['is_unread', 'mentions_count', 'message_count']).
             pipe(
                 combineLatestWith(observeAllMyChannelNotifyProps(server.database)),
                 combineLatestWith(observeUnreadsAndMentions(server.database, {includeDmGm: true})),

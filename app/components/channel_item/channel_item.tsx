@@ -30,6 +30,7 @@ type Props = {
     membersCount: number;
     isUnread: boolean;
     mentionsCount: number;
+    messageCount: number;
     onPress: (channel: ChannelModel | Channel) => void;
     teamDisplayName?: string;
     testID?: string;
@@ -76,8 +77,8 @@ export const getStyleSheet = makeStyleSheetFromTheme((theme: Theme) => ({
         alignSelf: undefined,
     },
     badgeOnCenterBg: {
-        color: theme.buttonColor,
-        backgroundColor: theme.buttonBg,
+        color: '#ffffff',
+        backgroundColor: '#f74343',
         borderColor: theme.centerChannelBg,
     },
     mutedBadge: {
@@ -113,6 +114,7 @@ const ChannelItem = ({
     membersCount,
     isUnread,
     mentionsCount,
+    messageCount,
     onPress,
     teamDisplayName = '',
     testID,
@@ -202,8 +204,10 @@ const ChannelItem = ({
                 />
                 <View style={styles.filler}/>
                 <Badge
-                    visible={mentionsCount > 0}
-                    value={mentionsCount}
+                    visible={mentionsCount > 0 || (isUnread && messageCount > 0)}
+                    value={mentionsCount > 0 ? mentionsCount : messageCount}
+                    backgroundColor={'#f74343'}
+                    color={'#ffffff'}
                     style={[styles.badge, isMuted && styles.mutedBadge, isOnCenterBg && styles.badgeOnCenterBg]}
                 />
                 {hasCall &&
