@@ -369,7 +369,14 @@ export const isAudio = (file?: FileInfo | FileModel) => {
         mime = lookupMimeType(file.name);
     }
 
-    return SUPPORTED_AUDIO_FORMAT!.includes(mime);
+    if (SUPPORTED_AUDIO_FORMAT!.includes(mime)) {
+        return true;
+    }
+
+    // Fallback: detect by file extension when MIME type is missing or unsupported
+    // (e.g. web/desktop clients may send audio/aac, audio/x-m4a, etc.)
+    const extension = file.extension?.toLowerCase() || file.name?.split('.').pop()?.toLowerCase();
+    return Boolean(extension && Files.AUDIO_TYPES.includes(extension));
 };
 
 export function getFormattedFileSize(bytes: number): string {

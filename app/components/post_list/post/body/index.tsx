@@ -20,6 +20,7 @@ import Content from './content';
 import Failed from './failed';
 import Message from './message';
 import Reactions from './reactions';
+import VoiceMessagePost from './voice_message_post';
 
 import type PostModel from '@typings/database/models/servers/post';
 import type {SearchPattern} from '@typings/global/markdown';
@@ -181,12 +182,17 @@ const Body = ({
         );
     }
 
+    const isVoiceMessage = post.type === 'custom_voice';
+
     const acknowledgementsVisible = isPostAcknowledgementEnabled && post.metadata?.priority?.requested_ack;
     const reactionsVisible = hasReactions && showAddReaction;
     if (!hasBeenDeleted) {
         body = (
             <View style={style.messageBody}>
-                {message}
+                {!isVoiceMessage && message}
+                {isVoiceMessage && (
+                    <VoiceMessagePost post={post}/>
+                )}
                 {hasContent &&
                 <Content
                     isReplyPost={isReplyPost}

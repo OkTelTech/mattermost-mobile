@@ -33,7 +33,8 @@ type PostType = PostTypesUserCreatable
     | 'custom_calls_recording'
     | 'custom_run_update'
     | 'custom_llmbot'
-    | 'custom_llm_postback';
+    | 'custom_llm_postback'
+    | 'custom_voice';
 
 type PostEmbedType = 'image' | 'message_attachment' | 'opengraph' | 'permalink';
 

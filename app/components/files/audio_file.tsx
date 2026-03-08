@@ -4,17 +4,21 @@
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {useIntl} from 'react-intl';
 import {
+    Platform,
     View,
     TouchableOpacity,
     Text,
     TouchableWithoutFeedback,
     type GestureResponderEvent,
 } from 'react-native';
+import RNFS from 'react-native-fs';
 import Video, {type OnLoadData, type OnProgressData, type OnVideoErrorData, type VideoRef} from 'react-native-video';
 
+import {useServerUrl} from '@context/server';
 import {useTheme} from '@context/theme';
 import {useDownloadFileAndPreview} from '@hooks/files';
 import useThrottled from '@hooks/throttled';
+import NetworkManager from '@managers/network_manager';
 import {alertDownloadDocumentDisabled, alertOnlyPDFSupported} from '@utils/document';
 import {logDebug} from '@utils/log';
 import {changeOpacity, makeStyleSheetFromTheme} from '@utils/theme';
@@ -68,6 +72,7 @@ const getStyleSheet = makeStyleSheetFromTheme((theme: Theme) => ({
 
 const AudioFile = ({file, canDownloadFiles, enableSecureFilePreview}: Props) => {
     const intl = useIntl();
+    const serverUrl = useServerUrl();
     const theme = useTheme();
     const style = getStyleSheet(theme);
     const [hasPaused, setHasPaused] = useState<boolean>(true);
@@ -92,7 +97,67 @@ const AudioFile = ({file, canDownloadFiles, enableSecureFilePreview}: Props) => 
         return () => null;
     }, [hasEnded]);
 
-    const source = useMemo(() => ({uri: file.uri}), [file.uri]);
+    const [androidLocalUri, setAndroidLocalUri] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (Platform.OS !== 'android' || !file.id || !file.uri) {
+            return;
+        }
+
+        let cancelled = false;
+        const ext = file.extension || 'm4a';
+        const tempPath = `${RNFS.CachesDirectoryPath}/audio_${file.id}.${ext}`;
+
+        const downloadAudio = async () => {
+            try {
+                const exists = await RNFS.exists(tempPath);
+                if (!exists) {
+                    let authHeader: string | undefined;
+                    try {
+                        authHeader = NetworkManager.getClient(serverUrl).requestHeaders.Authorization;
+                    } catch {
+                        // client not available
+                    }
+                    await RNFS.downloadFile({
+                        fromUrl: file.uri!,
+                        toFile: tempPath,
+                        ...(authHeader ? {headers: {Authorization: authHeader}} : {}),
+                    }).promise;
+                }
+                if (!cancelled) {
+                    setAndroidLocalUri(`file://${tempPath}`);
+                }
+            } catch {
+                // fall back to direct URI on error
+                if (!cancelled) {
+                    setAndroidLocalUri(file.uri ?? null);
+                }
+            }
+        };
+
+        downloadAudio();
+        return () => {
+            cancelled = true;
+        };
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps -- file.id and serverUrl identify the resource; file.uri and file.extension are stable for the same file
+    }, [file.id, serverUrl]);
+
+    const source = useMemo(() => {
+        if (Platform.OS === 'android') {
+            return {uri: androidLocalUri ?? ''};
+        }
+        let authHeader: string | undefined;
+        try {
+            authHeader = NetworkManager.getClient(serverUrl).requestHeaders.Authorization;
+        } catch {
+            // client not available
+        }
+        return {
+            uri: file.uri,
+            ...(authHeader ? {headers: {Authorization: authHeader}} : {}),
+        };
+    }, [androidLocalUri, file.uri, serverUrl]);
 
     const {toggleDownloadAndPreview} = useDownloadFileAndPreview(enableSecureFilePreview);
 
@@ -193,6 +258,7 @@ const AudioFile = ({file, canDownloadFiles, enableSecureFilePreview}: Props) => 
                     />
                 </TouchableOpacity>
 
+                {(Platform.OS !== 'android' || androidLocalUri) &&
                 <Video
                     ref={videoRef}
                     source={source}
@@ -203,6 +269,7 @@ const AudioFile = ({file, canDownloadFiles, enableSecureFilePreview}: Props) => 
                     onEnd={onEnd}
                     onAudioFocusChanged={onAudioFocusChanged}
                 />
+                }
 
                 <View style={style.progressBar}>
                     <ProgressBar

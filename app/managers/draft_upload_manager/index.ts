@@ -6,6 +6,7 @@ import {AppState, type AppStateStatus} from 'react-native';
 import {updateDraftFile} from '@actions/local/draft';
 import {uploadFile, uploadFileDirectly} from '@actions/remote/file';
 import {PROGRESS_TIME_TO_STORE} from '@constants/files';
+
 import type {ClientResponse, ClientResponseError} from '@mattermost/react-native-network-client';
 
 type FileHandler = {
