@@ -23,6 +23,14 @@ function createFileDownload(url: string, destination: string, authHeader: string
     let jobId: number | undefined;
 
     const doDownload = async (): Promise<ClientResponse> => {
+        // Ensure destination directory exists — RNFS does not create directories automatically
+        const dirPath = dest.substring(0, dest.lastIndexOf('/'));
+        try {
+            await RNFS.mkdir(dirPath);
+        } catch {
+            // Directory may already exist; ignore
+        }
+
         const headers: Record<string, string> = {};
         if (authHeader) {
             headers.Authorization = authHeader;
@@ -199,6 +207,33 @@ export const uploadFile = (
 
     run();
     return {cancel};
+};
+
+// Upload a file using the old direct multipart API (POST /api/v4/files).
+// Used for voice messages (audio files) which don't need GCS presigned URL flow.
+export const uploadFileDirectly = (
+    serverUrl: string,
+    file: FileInfo | ExtractedFileInfo,
+    channelId: string,
+    onProgress: (fractionCompleted: number, bytesRead?: number | null | undefined) => void = () => {/*Do Nothing*/},
+    onComplete: (response: ClientResponse) => void = () => {/*Do Nothing*/},
+    onError: (response: ClientResponseError) => void = () => {/*Do Nothing*/},
+) => {
+    let cancelFn: (() => void) | undefined;
+    try {
+        const client = NetworkManager.getClient(serverUrl);
+        const onCompleteWrapped = (response: ClientResponse) => {
+            if (response.ok && response.data?.file_infos?.[0]) {
+                onComplete({...response, data: response.data.file_infos[0]});
+            } else {
+                onError({code: response.code ?? 0, message: 'Upload failed', domain: ''});
+            }
+        };
+        cancelFn = client.uploadAttachment(file, channelId, onProgress, onCompleteWrapped, onError);
+    } catch (error) {
+        onError({code: 0, message: getFullErrorMessage(error), domain: ''});
+    }
+    return {cancel: cancelFn ?? (() => { /* noop */ })};
 };
 
 export const fetchPublicLink = async (serverUrl: string, fileId: string) => {

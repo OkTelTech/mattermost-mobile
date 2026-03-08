@@ -4,7 +4,7 @@
 import {AppState, type AppStateStatus} from 'react-native';
 
 import {updateDraftFile} from '@actions/local/draft';
-import {uploadFile} from '@actions/remote/file';
+import {uploadFile, uploadFileDirectly} from '@actions/remote/file';
 import {PROGRESS_TIME_TO_STORE} from '@constants/files';
 import type {ClientResponse, ClientResponseError} from '@mattermost/react-native-network-client';
 
@@ -65,7 +65,10 @@ class DraftEditPostUploadManagerSingleton {
             this.handleError(message, file.clientId!);
         };
 
-        const {cancel} = uploadFile(serverUrl, file, channelId, onProgress, onComplete, onError);
+        const isImage = file.mime_type?.startsWith('image/') || Boolean(file.name?.match(/\.(jpg|jpeg|png|gif|webp|heic|heif|bmp|tiff?)$/i));
+        const {cancel} = isImage
+            ? uploadFile(serverUrl, file, channelId, onProgress, onComplete, onError)
+            : uploadFileDirectly(serverUrl, file, channelId, onProgress, onComplete, onError);
         this.handlers[file.clientId!].cancel = cancel;
     };
 

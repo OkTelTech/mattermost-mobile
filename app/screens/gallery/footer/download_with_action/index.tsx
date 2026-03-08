@@ -7,8 +7,9 @@ import {applicationName} from 'expo-application';
 import {cacheDirectory, createDownloadResumable, deleteAsync, makeDirectoryAsync, type DownloadResumable} from 'expo-file-system';
 import React, {useEffect, useRef, useState} from 'react';
 import {useIntl} from 'react-intl';
-import {Platform, StyleSheet, Text, View} from 'react-native';
+import {Alert, Platform, StyleSheet, Text, View} from 'react-native';
 import FileViewer from 'react-native-file-viewer';
+import Permissions from 'react-native-permissions';
 import {useAnimatedStyle, withTiming} from 'react-native-reanimated';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Share from 'react-native-share';
@@ -210,8 +211,39 @@ const DownloadWithAction = ({action, enableSecureFilePreview, item, onDownloadSu
     const saveImageOrVideo = async (path: string) => {
         if (mounted.current) {
             try {
+                if (Platform.OS === 'ios') {
+                    const permission = Permissions.PERMISSIONS.IOS.PHOTO_LIBRARY;
+                    const status = await Permissions.check(permission);
+                    if (status === Permissions.RESULTS.DENIED) {
+                        const result = await Permissions.request(permission);
+                        if (result !== Permissions.RESULTS.GRANTED) {
+                            Alert.alert(
+                                intl.formatMessage({id: 'mobile.photo_library.permission_denied_title', defaultMessage: 'Photo library access required'}),
+                                intl.formatMessage({id: 'mobile.photo_library.permission_denied_description', defaultMessage: 'To save images, allow photo library access in Settings.'}),
+                                [
+                                    {text: intl.formatMessage({id: 'mobile.permission_denied_dismiss', defaultMessage: "Don't Allow"})},
+                                    {text: intl.formatMessage({id: 'mobile.permission_denied_retry', defaultMessage: 'Settings'}), onPress: () => Permissions.openSettings()},
+                                ],
+                            );
+                            setAction('none');
+                            return;
+                        }
+                    } else if (status === Permissions.RESULTS.BLOCKED) {
+                        Alert.alert(
+                            intl.formatMessage({id: 'mobile.photo_library.permission_denied_title', defaultMessage: 'Photo library access required'}),
+                            intl.formatMessage({id: 'mobile.photo_library.permission_denied_description', defaultMessage: 'To save images, allow photo library access in Settings.'}),
+                            [
+                                {text: intl.formatMessage({id: 'mobile.permission_denied_dismiss', defaultMessage: "Don't Allow"})},
+                                {text: intl.formatMessage({id: 'mobile.permission_denied_retry', defaultMessage: 'Settings'}), onPress: () => Permissions.openSettings()},
+                            ],
+                        );
+                        setAction('none');
+                        return;
+                    }
+                }
+
                 const cameraType = item.type === 'avatar' ? 'image' : item.type;
-                await CameraRoll.saveAsset(path, {
+                await CameraRoll.saveAsset(pathWithPrefix('file://', path), {
                     type: cameraType === 'image' ? 'photo' : 'video',
                     album: applicationName || '',
                 });
