@@ -103,10 +103,21 @@ public class Database: NSObject {
     public func generateId() -> String {
         return UUID().uuidString.lowercased()
     }
+
+    /// Opens a SQLite connection with WAL journal mode and a busy timeout so that
+    /// concurrent access from the main app and extensions does not cause SQLITE_BUSY (code 5) crashes.
+    internal func openConnection(_ path: String) throws -> Connection {
+        let db = try Connection(path)
+        // WAL mode allows the extension to read while the main app is writing.
+        try db.execute("PRAGMA journal_mode=WAL")
+        // Retry for up to 5 seconds before throwing SQLITE_BUSY.
+        db.busyTimeout = 5.0
+        return db
+    }
     
     public func getOnlyServerUrl() throws -> String {
         do {
-            let db = try Connection(DEFAULT_DB_PATH)
+            let db = try openConnection(DEFAULT_DB_PATH)
             let url = Expression<String>("url")
             let identifier = Expression<String>("identifier")
             let lastActiveAt = Expression<Int64>("last_active_at")
@@ -134,7 +145,7 @@ public class Database: NSObject {
 
     public func getServerUrlForServer(_ id: String) throws -> String {
         do {
-            let db = try Connection(DEFAULT_DB_PATH)
+            let db = try openConnection(DEFAULT_DB_PATH)
             let url = Expression<String>("url")
             let identifier = Expression<String>("identifier")
             let query = serversTable.select(url).filter(identifier == id)
@@ -152,7 +163,7 @@ public class Database: NSObject {
     }
     
     public func getAllActiveDatabases<T: Codable>() -> [T] {
-        guard let db = try? Connection(DEFAULT_DB_PATH) else {return []}
+        guard let db = try? openConnection(DEFAULT_DB_PATH) else {return []}
         let lastActiveAt = Expression<Int64>("last_active_at")
         let identifier = Expression<String>("identifier")
         let query = serversTable.filter(lastActiveAt > 0 && identifier != "").order(lastActiveAt.desc)
@@ -169,7 +180,7 @@ public class Database: NSObject {
     }
     
     public func getAllActiveServerUrls() -> [String] {
-        guard let db = try? Connection(DEFAULT_DB_PATH) else {return []}
+        guard let db = try? openConnection(DEFAULT_DB_PATH) else {return []}
         let lastActiveAt = Expression<Int64>("last_active_at")
         let identifier = Expression<String>("identifier")
         let url = Expression<String>("url")
@@ -187,7 +198,7 @@ public class Database: NSObject {
     }
     
     public func getCurrentServerDatabase<T: Codable>() -> T? {
-        guard let db = try? Connection(DEFAULT_DB_PATH) else {return nil}
+        guard let db = try? openConnection(DEFAULT_DB_PATH) else {return nil}
         do {
             let lastActiveAt = Expression<Int64>("last_active_at")
             let identifier = Expression<String>("identifier")
@@ -205,16 +216,16 @@ public class Database: NSObject {
     }
     
     internal func getDatabaseForServer(_ serverUrl: String) throws -> Connection {
-        let db = try Connection(DEFAULT_DB_PATH)
+        let db = try openConnection(DEFAULT_DB_PATH)
         let url = Expression<String>("url")
         let dbPath = Expression<String>("db_path")
         let query = serversTable.select(dbPath).where(url == serverUrl)
-        
+
         if let result = try db.pluck(query) {
             let path = try result.get(dbPath)
-            return try Connection(path)
+            return try openConnection(path)
         }
-        
+
         throw DatabaseError.NoResults(query.expression.description)
     }
     
