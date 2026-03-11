@@ -12,7 +12,7 @@ import {THREAD} from '@constants/screens';
 import StatusUpdatePost from '@playbooks/components/status_update_post';
 import {PLAYBOOKS_UPDATE_STATUS_POST_TYPE} from '@playbooks/constants/plugin';
 import {isEdited as postEdited, isPostFailed} from '@utils/post';
-import {makeStyleSheetFromTheme} from '@utils/theme';
+import {changeOpacity, makeStyleSheetFromTheme} from '@utils/theme';
 
 import Acknowledgements from './acknowledgements';
 import AddMembers from './add_members';
@@ -37,6 +37,7 @@ type BodyProps = {
     isFirstReply?: boolean;
     isJumboEmoji: boolean;
     isLastReply?: boolean;
+    isOwnPost?: boolean;
     isPendingOrFailed: boolean;
     isPostAcknowledgementEnabled?: boolean;
     isPostAddChannelMember: boolean;
@@ -59,6 +60,40 @@ const getStyleSheet = makeStyleSheetFromTheme((theme: Theme) => {
         messageBody: {
             paddingVertical: 2,
             flex: 1,
+        },
+        bubbleOwn: {
+            backgroundColor: theme.centerChannelBg,
+            borderRadius: 18,
+            borderBottomRightRadius: 4,
+            borderWidth: 1,
+            borderColor: changeOpacity(theme.centerChannelColor, 0.16),
+            paddingHorizontal: 12,
+            paddingVertical: 8,
+            maxWidth: '85%',
+            alignSelf: 'flex-end',
+            overflow: 'hidden',
+        },
+        bubbleOwnMedia: {
+            maxWidth: '85%',
+            alignSelf: 'flex-end',
+        },
+        bubbleOther: {
+            backgroundColor: changeOpacity(theme.centerChannelColor, 0.08),
+            borderRadius: 18,
+            borderBottomLeftRadius: 4,
+            paddingHorizontal: 12,
+            paddingVertical: 8,
+            maxWidth: '85%',
+            alignSelf: 'flex-start',
+            overflow: 'hidden',
+        },
+        bubbleOtherMedia: {
+            maxWidth: '85%',
+            alignSelf: 'flex-start',
+        },
+        messageContainerWithReplyBarOwn: {
+            flexDirection: 'row',
+            justifyContent: 'flex-end',
         },
         messageContainer: {width: '100%'},
         replyBar: {
@@ -89,7 +124,7 @@ const getStyleSheet = makeStyleSheetFromTheme((theme: Theme) => {
 
 const Body = ({
     appsEnabled, hasFiles, hasReactions, highlight, highlightReplyBar,
-    isCRTEnabled, isEphemeral, isFirstReply, isJumboEmoji, isLastReply, isPendingOrFailed, isPostAcknowledgementEnabled, isPostAddChannelMember,
+    isCRTEnabled, isEphemeral, isFirstReply, isJumboEmoji, isLastReply, isOwnPost, isPendingOrFailed, isPostAcknowledgementEnabled, isPostAddChannelMember,
     location, post, searchPatterns, showAddReaction, theme,
 }: BodyProps) => {
     const style = getStyleSheet(theme);
@@ -184,11 +219,17 @@ const Body = ({
 
     const isVoiceMessage = post.type === 'custom_voice';
 
+    // Media-only posts (files, images, audio) use no-bubble style
+    const isMediaOnly = isVoiceMessage || (hasFiles && !message && !hasContent);
+    const bubbleStyle = isOwnPost
+        ? (isMediaOnly ? style.bubbleOwnMedia : style.bubbleOwn)
+        : (isMediaOnly ? style.bubbleOtherMedia : style.bubbleOther);
+
     const acknowledgementsVisible = isPostAcknowledgementEnabled && post.metadata?.priority?.requested_ack;
     const reactionsVisible = hasReactions && showAddReaction;
     if (!hasBeenDeleted) {
         body = (
-            <View style={style.messageBody}>
+            <View style={bubbleStyle}>
                 {!isVoiceMessage && message}
                 {isVoiceMessage && (
                     <VoiceMessagePost post={post}/>
@@ -236,10 +277,10 @@ const Body = ({
 
     return (
         <View
-            style={style.messageContainerWithReplyBar}
+            style={isOwnPost ? style.messageContainerWithReplyBarOwn : style.messageContainerWithReplyBar}
             onLayout={onLayout}
         >
-            <View style={replyBarStyle}/>
+            {!isOwnPost && <View style={replyBarStyle}/>}
             {body}
             {isFailed &&
             <Failed

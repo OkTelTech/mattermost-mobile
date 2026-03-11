@@ -80,7 +80,8 @@ type PostProps = {
 
 const getStyleSheet = makeStyleSheetFromTheme((theme: Theme) => {
     return {
-        consecutive: {marginTop: 0},
+        consecutive: {marginTop: 6},
+        consecutiveOwn: {marginTop: 6},
         consecutivePostContainer: {
             marginBottom: 10,
             marginRight: 10,
@@ -111,7 +112,22 @@ const getStyleSheet = makeStyleSheetFromTheme((theme: Theme) => {
             flex: 1,
             flexDirection: 'column',
         },
+        rightColumnOwn: {
+            flex: 1,
+            flexDirection: 'column',
+            alignItems: 'flex-end',
+        },
         rightColumnPadding: {paddingBottom: 3},
+        systemBubble: {
+            backgroundColor: changeOpacity(theme.centerChannelColor, 0.08),
+            borderRadius: 18,
+            borderBottomLeftRadius: 4,
+            paddingHorizontal: 12,
+            paddingVertical: 8,
+            maxWidth: '85%',
+            alignSelf: 'flex-start' as const,
+            overflow: 'hidden' as const,
+        },
     };
 });
 
@@ -165,6 +181,7 @@ const Post = ({
     const isUnrevealedPost = isUnrevealedBoRPost(post);
     const isOwnPost = Boolean(currentUser && post.userId === currentUser.id);
     const isAgentPostType = isAgentPost(post);
+    const showAsTelegramBubble = isOwnPost && !isSystemPost && !isAutoResponder;
     const hasBeenDeleted = (post.deleteAt !== 0);
     const isWebHook = isFromWebhook(post);
     const hasSameRoot = useMemo(() => {
@@ -279,7 +296,9 @@ const Post = ({
     const highlightSaved = isSaved && !skipSavedHeader;
     const hightlightPinned = post.isPinned && !skipPinnedHeader;
     const itemTestID = `${testID}.${post.id}`;
-    const rightColumnStyle: StyleProp<ViewStyle> = [styles.rightColumn, (Boolean(post.rootId) && isLastReply && styles.rightColumnPadding)];
+    const rightColumnStyle: StyleProp<ViewStyle> = showAsTelegramBubble
+        ? [styles.rightColumnOwn, (Boolean(post.rootId) && isLastReply && styles.rightColumnPadding)]
+        : [styles.rightColumn, (Boolean(post.rootId) && isLastReply && styles.rightColumnPadding)];
     const pendingPostStyle: StyleProp<ViewStyle> | undefined = isPendingOrFailed ? styles.pendingPost : undefined;
 
     let highlightedStyle: StyleProp<ViewStyle>;
@@ -300,10 +319,12 @@ const Post = ({
 
     const sameSequence = hasReplies ? (hasReplies && post.rootId) : !post.rootId;
     if (!showPostPriority && hasSameRoot && isConsecutivePost && sameSequence) {
-        consecutiveStyle = styles.consecutive;
-        postAvatar = <View style={styles.consecutivePostContainer}/>;
+        consecutiveStyle = showAsTelegramBubble ? styles.consecutiveOwn : styles.consecutive;
+        if (!showAsTelegramBubble) {
+            postAvatar = <View style={styles.consecutivePostContainer}/>;
+        }
     } else {
-        postAvatar = (
+        postAvatar = showAsTelegramBubble ? null : (
             <View style={[styles.profilePictureContainer, pendingPostStyle]}>
                 {(isAutoResponder || isSystemPost) ? (
                     <SystemAvatar theme={theme}/>
@@ -348,10 +369,12 @@ const Post = ({
     let body;
     if (isSystemPost && !isEphemeral && !isAutoResponder) {
         body = (
-            <SystemMessage
-                location={location}
-                post={post}
-            />
+            <View style={styles.systemBubble}>
+                <SystemMessage
+                    location={location}
+                    post={post}
+                />
+            </View>
         );
     } else if (isCallsPost && !hasBeenDeleted) {
         body = (
@@ -391,6 +414,7 @@ const Post = ({
                 isFirstReply={isFirstReply}
                 isJumboEmoji={isJumboEmoji}
                 isLastReply={isLastReply}
+                isOwnPost={showAsTelegramBubble}
                 isPendingOrFailed={isPendingOrFailed}
                 isPostAcknowledgementEnabled={isPostAcknowledgementEnabled}
                 isPostAddChannelMember={isPostAddChannelMember}

@@ -58,6 +58,11 @@ const getStyleSheet = makeStyleSheetFromTheme((theme: Theme) => {
             flex: 1,
             marginTop: 10,
         },
+        containerOwn: {
+            flex: 1,
+            marginTop: 10,
+            alignItems: 'flex-end',
+        },
         pendingPost: {
             opacity: 0.5,
         },
@@ -66,6 +71,12 @@ const getStyleSheet = makeStyleSheetFromTheme((theme: Theme) => {
             flexDirection: 'row',
             alignItems: 'center',
             gap: 5,
+        },
+        wrapperOwn: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 5,
+            justifyContent: 'flex-end',
         },
         time: {
             color: theme.centerChannelColor,
@@ -88,6 +99,7 @@ const Header = (props: HeaderProps) => {
     } = props;
     const theme = useTheme();
     const style = getStyleSheet(theme);
+    const isOwnPost = Boolean(currentUser && post.userId === currentUser.id) && !isSystemPost && !isAutoResponse;
     const pendingPostStyle = isPendingOrFailed ? style.pendingPost : undefined;
     const isReplyPost = Boolean(post.rootId && !isEphemeral);
     const showReply = !isReplyPost && (location !== THREAD) && (shouldRenderReplyButton && (!rootPostAuthor && commentCount > 0));
@@ -113,23 +125,25 @@ const Header = (props: HeaderProps) => {
 
     return (
         <>
-            <View style={[style.container, pendingPostStyle]}>
-                <View style={style.wrapper}>
-                    <HeaderDisplayName
-                        channelId={post.channelId}
-                        commentCount={commentCount}
-                        displayName={displayName}
-                        location={location}
-                        rootPostAuthor={rootAuthorDisplayName}
-                        shouldRenderReplyButton={shouldRenderReplyButton}
-                        theme={theme}
-                        userIconOverride={userIconOverride}
-                        userId={post.userId}
-                        usernameOverride={usernameOverride}
-                        showCustomStatusEmoji={showCustomStatusEmoji}
-                        customStatus={customStatus!}
-                    />
-                    {(!isSystemPost || isAutoResponse) &&
+            <View style={[isOwnPost ? style.containerOwn : style.container, pendingPostStyle]}>
+                <View style={isOwnPost ? style.wrapperOwn : style.wrapper}>
+                    {!isOwnPost && (
+                        <HeaderDisplayName
+                            channelId={post.channelId}
+                            commentCount={commentCount}
+                            displayName={displayName}
+                            location={location}
+                            rootPostAuthor={rootAuthorDisplayName}
+                            shouldRenderReplyButton={shouldRenderReplyButton}
+                            theme={theme}
+                            userIconOverride={userIconOverride}
+                            userId={post.userId}
+                            usernameOverride={usernameOverride}
+                            showCustomStatusEmoji={showCustomStatusEmoji}
+                            customStatus={customStatus!}
+                        />
+                    )}
+                    {!isOwnPost && (!isSystemPost || isAutoResponse) &&
                     <HeaderTag
                         isAutoResponder={isAutoResponse}
                         isAutomation={isWebHook || author?.isBot}
