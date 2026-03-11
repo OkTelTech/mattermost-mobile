@@ -162,7 +162,7 @@ const Servers = React.forwardRef<ServersRef>((_, ref) => {
 
     return (
         <ServerIcon
-            hasUnreads={total.unread}
+            hasUnreads={false}
             mentionCount={total.mentions}
             onPress={onPress}
             style={styles.icon}

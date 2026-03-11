@@ -11,7 +11,7 @@ import {selectDefaultTeam} from '@helpers/api/team';
 import {DEFAULT_LOCALE} from '@i18n';
 
 import {prepareDeleteCategory} from './categories';
-import {prepareDeleteChannel, getDefaultChannelForTeam, observeMyChannelMentionCount, observeMyChannelUnreads} from './channel';
+import {prepareDeleteChannel, getDefaultChannelForTeam, observeMyChannelMentionCount, observeMyChannelUnreads, queryMyChannelsByTeam} from './channel';
 import {queryPreferencesByCategoryAndName} from './preference';
 import {patchTeamHistory, getConfig, getTeamHistory, observeCurrentTeamId, getCurrentTeamId} from './system';
 import {observeThreadMentionCount, observeUnreadsAndMentions} from './thread';
@@ -434,6 +434,15 @@ export function observeIsTeamUnread(database: Database, teamId: string): Observa
         map$(([channels, threads]) => {
             return channels || threads.unreads;
         }),
+        distinctUntilChanged(),
+    );
+}
+
+export function observeTeamUnreadMessageCount(database: Database, teamId: string): Observable<number> {
+    return queryMyChannelsByTeam(database, teamId).observeWithColumns(['is_unread', 'message_count']).pipe(
+        switchMap((myChannels) => of$(myChannels.reduce((acc, v) => {
+            return acc + (v.isUnread ? (v.messageCount ?? 0) : 0);
+        }, 0))),
         distinctUntilChanged(),
     );
 }

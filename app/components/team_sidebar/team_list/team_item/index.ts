@@ -6,7 +6,7 @@ import {of as of$} from 'rxjs';
 import {switchMap, distinctUntilChanged} from 'rxjs/operators';
 
 import {observeCurrentTeamId} from '@queries/servers/system';
-import {observeIsTeamUnread, observeMentionCount, observeTeam} from '@queries/servers/team';
+import {observeIsTeamUnread, observeMentionCount, observeTeam, observeTeamUnreadMessageCount} from '@queries/servers/team';
 
 import TeamItem from './team_item';
 
@@ -28,6 +28,7 @@ const enhance = withObservables(['myTeam'], ({myTeam, database}: WithTeamsArgs) 
         team: observeTeam(database, myTeam.id),
         mentionCount: observeMentionCount(database, myTeam.id, false),
         hasUnreads: observeIsTeamUnread(database, myTeam.id),
+        unreadCount: observeTeamUnreadMessageCount(database, myTeam.id),
     };
 });
 

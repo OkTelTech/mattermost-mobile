@@ -20,6 +20,7 @@ type Props = {
     team?: TeamModel;
     hasUnreads: boolean;
     mentionCount: number;
+    unreadCount: number;
     selected: boolean;
 }
 
@@ -39,10 +40,6 @@ const getStyleSheet = makeStyleSheetFromTheme((theme: Theme) => {
             borderRadius: 14,
             borderColor: theme.sidebarTextActiveBorder,
         },
-        unread: {
-            left: 43,
-            top: 3,
-        },
         mentionsOneDigit: {
             top: 1,
             left: 31,
@@ -58,7 +55,7 @@ const getStyleSheet = makeStyleSheetFromTheme((theme: Theme) => {
     };
 });
 
-export default function TeamItem({team, hasUnreads, mentionCount, selected}: Props) {
+export default function TeamItem({team, hasUnreads, mentionCount, unreadCount, selected}: Props) {
     const theme = useTheme();
     const styles = getStyleSheet(theme);
     const serverUrl = useServerUrl();
@@ -76,22 +73,16 @@ export default function TeamItem({team, hasUnreads, mentionCount, selected}: Pro
         return null;
     }
 
-    const hasBadge = Boolean(mentionCount || hasUnreads);
-    let badgeStyle = styles.unread;
-    let value = mentionCount;
-    if (!mentionCount && hasUnreads) {
-        value = -1;
-    }
+    const badgeValue = mentionCount > 0 ? mentionCount : (hasUnreads ? unreadCount : 0);
+    const hasBadge = badgeValue > 0;
+    let badgeStyle = styles.mentionsOneDigit;
 
     switch (true) {
-        case value > 99:
+        case badgeValue > 99:
             badgeStyle = styles.mentionsThreeDigits;
             break;
-        case value > 9:
+        case badgeValue > 9:
             badgeStyle = styles.mentionsTwoDigits;
-            break;
-        case value > 0:
-            badgeStyle = styles.mentionsOneDigit;
             break;
     }
 
@@ -121,7 +112,7 @@ export default function TeamItem({team, hasUnreads, mentionCount, selected}: Pro
                 color={'#ffffff'}
                 visible={hasBadge && !selected}
                 style={badgeStyle}
-                value={value}
+                value={badgeValue}
             />
         </>
     );
