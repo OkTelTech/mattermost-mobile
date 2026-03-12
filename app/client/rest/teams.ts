@@ -30,6 +30,7 @@ export interface ClientTeamsMix {
     removeFromTeam: (teamId: string, userId: string) => Promise<any>;
     getTeamStats: (teamId: string) => Promise<any>;
     getTeamIconUrl: (teamId: string, lastTeamIconUpdate: number) => string;
+    teamNameExists: (teamName: string) => Promise<{exists: boolean}>;
 }
 
 const ClientTeams = <TBase extends Constructor<ClientBase>>(superclass: TBase) => class extends superclass {
@@ -191,6 +192,13 @@ const ClientTeams = <TBase extends Constructor<ClientBase>>(superclass: TBase) =
         }
 
         return `${this.getTeamRoute(teamId)}/image${buildQueryString(params)}`;
+    };
+
+    teamNameExists = async (teamName: string): Promise<{exists: boolean}> => {
+        return this.doFetch(
+            `${this.getTeamsRoute()}/name/${teamName}/exists`,
+            {method: 'get'},
+        );
     };
 };
 

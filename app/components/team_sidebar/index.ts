@@ -1,24 +1,26 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import {withObservables} from '@nozbe/watermelondb/react';
+import {withDatabase, withObservables} from '@nozbe/watermelondb/react';
+import {distinctUntilChanged, map} from 'rxjs/operators';
 
 import {withServerUrl} from '@context/server';
+import {observeCurrentUser} from '@queries/servers/user';
 import EphemeralStore from '@store/ephemeral_store';
+import {isSystemAdmin} from '@utils/user';
 
 import TeamSidebar from './team_sidebar';
 
-const enhanced = withObservables([], ({serverUrl}: {serverUrl: string}) => {
-    // TODO https://mattermost.atlassian.net/browse/MM-43622
-    // const canCreateTeams = observeCurrentUser(database).pipe(
-    //     switchMap((u) => (u ? of$(u.roles.split(' ')) : of$([]))),
-    //     switchMap((values) => queryRolesByNames(database, values).observe()),
-    //     switchMap((r) => of$(hasPermission(r, Permissions.CREATE_TEAM, false))),
-    // );
+import type {WithDatabaseArgs} from '@typings/database/database';
 
+const enhanced = withObservables([], ({serverUrl, database}: {serverUrl: string} & WithDatabaseArgs) => {
     return {
         canJoinOtherTeams: EphemeralStore.observeCanJoinOtherTeams(serverUrl),
+        canCreateTeam: observeCurrentUser(database).pipe(
+            map((user) => isSystemAdmin(user?.roles || '')),
+            distinctUntilChanged(),
+        ),
     };
 });
 
-export default withServerUrl(enhanced(TeamSidebar));
+export default withServerUrl(withDatabase(enhanced(TeamSidebar)));

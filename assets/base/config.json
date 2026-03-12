@@ -1,17 +1,14 @@
 {
     "AuthUrlScheme": "mmauth://",
     "AuthUrlSchemeDev": "mmauthbeta://",
-    "DefaultServerUrl": "https://oktel.io",
-    "DefaultServerName": "Oktel",
-    "TestServerUrl": "https://oktel.io",
+    "DefaultServerUrl": "https://staging.oktel.io",
+    "DefaultServerName": "Oktel Staging",
+    "TestServerUrl": "https://staging.oktel.io",
     "AutoSelectServerUrl": true,
-
     "WebsiteURL": "https://mattermost.com",
     "ServerNoticeURL": "https://github.com/mattermost/mattermost-server/blob/master/NOTICE.txt",
     "MobileNoticeURL": "https://github.com/mattermost/mattermost-mobile/blob/master/NOTICE.txt",
-
     "RudderApiKey": "",
-
     "SentryEnabled": false,
     "SentryDsnIos": "",
     "SentryDsnAndroid": "",
@@ -21,12 +18,12 @@
             "xhr": false,
             "console": true
         },
-        "severityLevelFilter": ["fatal"]
+        "severityLevelFilter": [
+            "fatal"
+        ]
     },
-
     "ShowReview": false,
     "ShowOnboarding": false,
-
     "ExperimentalNormalizeMarkdownLinks": false,
     "CustomRequestHeaders": {},
     "CollectNetworkMetrics": false

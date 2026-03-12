@@ -530,3 +530,26 @@ export const buildTeamIconUrl = (serverUrl: string, teamId: string, timestamp = 
         return '';
     }
 };
+
+export async function createTeam(serverUrl: string, team: {display_name: string; name: string; type: string}) {
+    try {
+        const client = NetworkManager.getClient(serverUrl);
+        const data = await client.createTeam(team as Team);
+        await fetchMyTeam(serverUrl, data.id);
+        return {data};
+    } catch (error) {
+        logDebug('[createTeam]', error);
+        forceLogoutIfNecessary(serverUrl, error);
+        return {error};
+    }
+}
+
+export async function teamNameExists(serverUrl: string, teamName: string): Promise<{exists: boolean} | {error: unknown}> {
+    try {
+        const client = NetworkManager.getClient(serverUrl);
+        return await client.teamNameExists(teamName);
+    } catch (error) {
+        logDebug('[teamNameExists]', error);
+        return {error};
+    }
+}

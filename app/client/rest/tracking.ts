@@ -5,7 +5,6 @@ import {defineMessage} from 'react-intl';
 import {DeviceEventEmitter, Platform} from 'react-native';
 
 import {CollectNetworkMetrics} from '@assets/config.json';
-import {logApiToReactotron} from '@utils/reactotron_api';
 import {Events} from '@constants';
 import {setServerCredentials} from '@init/credentials';
 import NetworkPerformanceManager from '@managers/network_performance_manager';
@@ -14,6 +13,7 @@ import {NetworkRequestMetrics} from '@managers/performance_metrics_manager/const
 import {isErrorWithStatusCode} from '@utils/errors';
 import {getFormattedFileSize} from '@utils/file';
 import {logDebug, logInfo} from '@utils/log';
+import {logApiToReactotron} from '@utils/reactotron_api';
 import {semverFromServerVersion} from '@utils/server';
 
 import * as ClientConstants from './constants';
@@ -448,7 +448,7 @@ export default class ClientTracking {
             response.metrics?.latency || 0,
             options.body,
             response.data,
-            
+
         );
 
         if (response.ok) {

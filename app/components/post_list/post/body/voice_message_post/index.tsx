@@ -1,6 +1,7 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
+import {withDatabase, withObservables} from '@nozbe/watermelondb/react';
 import React, {useMemo} from 'react';
 import {View, StyleSheet} from 'react-native';
 
@@ -8,7 +9,6 @@ import {buildFileUrl} from '@actions/remote/file';
 import AudioFile from '@components/files/audio_file';
 import {useServerUrl} from '@context/server';
 import {observeCanDownloadFiles, observeEnableSecureFilePreview} from '@queries/servers/security';
-import {withDatabase, withObservables} from '@nozbe/watermelondb/react';
 
 import type {WithDatabaseArgs} from '@typings/database/database';
 import type PostModel from '@typings/database/models/servers/post';

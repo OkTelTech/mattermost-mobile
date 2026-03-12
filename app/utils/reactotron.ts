@@ -1,8 +1,8 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import Reactotron from 'reactotron-react-native';
 import {Platform} from 'react-native';
+import Reactotron from 'reactotron-react-native';
 
 // Extend console for easy logging
 declare global {
@@ -16,12 +16,12 @@ let reactotron: typeof Reactotron | undefined;
 
 if (__DEV__) {
     // Configure Reactotron for development debugging
-    reactotron = Reactotron
-        .configure({
+    reactotron = Reactotron.
+        configure({
             name: 'Mattermost Mobile',
             host: Platform.OS === 'ios' ? 'localhost' : '10.0.2.2', // Android emulator uses 10.0.2.2
-        })
-        .useReactNative({
+        }).
+        useReactNative({
             asyncStorage: false, // We use WatermelonDB, not AsyncStorage
             networking: {
                 ignoreUrls: /symbolicate|logs/,
@@ -29,8 +29,8 @@ if (__DEV__) {
             editor: false,
             errors: {veto: () => false},
             overlay: false,
-        })
-        .connect();
+        }).
+        connect();
 
     console.tron = reactotron;
 }

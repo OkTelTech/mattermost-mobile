@@ -261,7 +261,7 @@ const LoginForm = ({
     }, []);
 
     const onLogin = useCallback(async () => {
-         Keyboard.dismiss();
+        Keyboard.dismiss();
         if (magicLinkEnabled && userLoginType === undefined) {
             const receivedUserLoginType = await checkUserLoginType();
             if (receivedUserLoginType === LOGIN_TYPE.MAGIC_LINK) {
@@ -274,7 +274,7 @@ const LoginForm = ({
             return;
         }
 
-        preSignIn(); 
+        preSignIn();
     }, [checkUserLoginType, intl, isDeactivated, magicLinkEnabled, preSignIn, setMagicLinkSent, userLoginType]);
 
     const onLoginChange = useCallback((text: string) => {

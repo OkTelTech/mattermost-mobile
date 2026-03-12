@@ -6,12 +6,14 @@ import {useIntl} from 'react-intl';
 import {View} from 'react-native';
 
 import CompassIcon from '@components/compass_icon';
-import SlideUpPanelItem from '@components/slide_up_panel_item';
+import SlideUpPanelItem, {ITEM_HEIGHT} from '@components/slide_up_panel_item';
 import TouchableWithFeedback from '@components/touchable_with_feedback';
 import {Screens} from '@constants';
 import {useTheme} from '@context/theme';
 import {usePreventDoubleTap} from '@hooks/utils';
+import {TITLE_HEIGHT} from '@screens/bottom_sheet/content';
 import {bottomSheet, dismissBottomSheet, showModal} from '@screens/navigation';
+import {bottomSheetSnapPoint} from '@utils/helpers';
 import {changeOpacity, makeStyleSheetFromTheme} from '@utils/theme';
 
 type Props = {
@@ -45,25 +47,62 @@ export default function AddTeam({canCreateTeam}: Props) {
     const styles = getStyleSheet(theme);
     const intl = useIntl();
 
-    const openJoinTeam = useCallback(async () => {
-        await dismissBottomSheet();
+    const openJoinTeam = useCallback(() => {
         const title = intl.formatMessage({id: 'mobile.add_team.join_team', defaultMessage: 'Join Another Team'});
         const closeButton = CompassIcon.getImageSourceSync('close', 24, theme.sidebarHeaderTextColor);
         const closeButtonId = 'close-join-team';
-        showModal(Screens.JOIN_TEAM, title, {closeButtonId}, {
-            topBar: {leftButtons: [{id: closeButtonId, icon: closeButton, testID: 'close.join_team.button'}]},
-        });
+        const options = {
+            topBar: {
+                leftButtons: [{
+                    id: closeButtonId,
+                    icon: closeButton,
+                    testID: 'close.join_team.button',
+                }],
+            },
+        };
+        showModal(Screens.JOIN_TEAM, title, {closeButtonId}, options);
     }, [intl, theme.sidebarHeaderTextColor]);
 
-    const openCreateTeam = useCallback(async () => {
-        await dismissBottomSheet();
+    const openCreateTeam = useCallback(() => {
         const title = intl.formatMessage({id: 'mobile.create_team.title', defaultMessage: 'Create a Team'});
         const closeButton = CompassIcon.getImageSourceSync('close', 24, theme.sidebarHeaderTextColor);
         const closeButtonId = 'close-create-team';
-        showModal(Screens.CREATE_TEAM, title, {closeButtonId}, {
-            topBar: {leftButtons: [{id: closeButtonId, icon: closeButton, testID: 'close.create_team.button'}]},
-        });
+        const options = {
+            topBar: {
+                leftButtons: [{
+                    id: closeButtonId,
+                    icon: closeButton,
+                    testID: 'close.create_team.button',
+                }],
+            },
+        };
+        showModal(Screens.CREATE_TEAM, title, {closeButtonId}, options);
     }, [intl, theme.sidebarHeaderTextColor]);
+
+    const renderContent = useCallback(() => {
+        return (
+            <>
+                <SlideUpPanelItem
+                    leftIcon='account-multiple-plus-outline'
+                    onPress={() => {
+                        dismissBottomSheet();
+                        openJoinTeam();
+                    }}
+                    testID='team_sidebar.add_team.join_team.option'
+                    text={intl.formatMessage({id: 'mobile.add_team.join_team', defaultMessage: 'Join Another Team'})}
+                />
+                <SlideUpPanelItem
+                    leftIcon='plus'
+                    onPress={() => {
+                        dismissBottomSheet();
+                        openCreateTeam();
+                    }}
+                    testID='team_sidebar.add_team.create_team.option'
+                    text={intl.formatMessage({id: 'mobile.create_team.title', defaultMessage: 'Create a Team'})}
+                />
+            </>
+        );
+    }, [intl, openJoinTeam, openCreateTeam]);
 
     const onPress = usePreventDoubleTap(useCallback(() => {
         if (!canCreateTeam) {
@@ -71,30 +110,14 @@ export default function AddTeam({canCreateTeam}: Props) {
             return;
         }
 
-        const renderContent = () => (
-            <>
-                <SlideUpPanelItem
-                    leftIcon='plus'
-                    onPress={openJoinTeam}
-                    testID='add_team.join_team'
-                    text={intl.formatMessage({id: 'mobile.add_team.join_team', defaultMessage: 'Join Another Team'})}
-                />
-                <SlideUpPanelItem
-                    leftIcon='plus-box-outline'
-                    onPress={openCreateTeam}
-                    testID='add_team.create_team'
-                    text={intl.formatMessage({id: 'mobile.create_team.title', defaultMessage: 'Create a Team'})}
-                />
-            </>
-        );
-
         bottomSheet({
             title: intl.formatMessage({id: 'mobile.add_team.title', defaultMessage: 'Add a Team'}),
             renderContent,
-            snapPoints: [1, 180],
+            snapPoints: [1, bottomSheetSnapPoint(2, ITEM_HEIGHT) + TITLE_HEIGHT],
             theme,
+            closeButtonId: 'close-add-team-bottom-sheet',
         });
-    }, [canCreateTeam, intl, openJoinTeam, openCreateTeam, theme]));
+    }, [canCreateTeam, intl, theme, openJoinTeam, renderContent]));
 
     return (
         <View style={styles.container}>

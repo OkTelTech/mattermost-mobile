@@ -32,7 +32,7 @@ TurboLogger.configure({
 
 if (__DEV__) {
     // Uncomment the next line to hide ALL yellow box warnings
-     LogBox.ignoreAllLogs(true);
+    LogBox.ignoreAllLogs(true);
 
     LogBox.ignoreLogs([
         'new NativeEventEmitter',

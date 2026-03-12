@@ -28,8 +28,8 @@ import {resetToHome, resetToLogin, resetToSelectServer, resetToTeams, resetToOnb
 import EphemeralStore from '@store/ephemeral_store';
 import {getLaunchPropsFromDeepLink, handleDeepLink} from '@utils/deep_link';
 import {logError, logInfo} from '@utils/log';
-import {loginOptions} from '@utils/server';
 import {convertToNotificationData} from '@utils/notification';
+import {loginOptions} from '@utils/server';
 import {removeProtocol, sanitizeUrl} from '@utils/url';
 
 import type {DeepLinkWithData, LaunchProps} from '@typings/launch';
@@ -214,8 +214,8 @@ const autoConnectToDefaultServer = async (props: LaunchProps): Promise<string> =
     let hasLoginForm = true;
     let numberSSOs = 0;
     let ssoOptions: SsoWithOptions = {};
-    let config = data.config ?? ({} as ClientConfig);
-    let license = data.license ?? ({} as ClientLicense);
+    const config = data.config ?? ({} as ClientConfig);
+    const license = data.license ?? ({} as ClientLicense);
 
     if (data.config && data.license) {
         // Security checks
