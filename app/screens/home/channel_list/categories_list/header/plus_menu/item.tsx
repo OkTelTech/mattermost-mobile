@@ -33,8 +33,8 @@ const PlusMenuItem = ({pickerAction, onPress}: PlusMenuItemProps) => {
             testID: 'plus_menu_item.open_direct_message',
         },
         invitePeopleToTeam: {
-            leftIcon: 'account-plus-outline',
-            text: intl.formatMessage({id: 'plus_menu.invite_people_to_team.title', defaultMessage: 'Invite people to the team'}),
+            leftIcon: 'account-multiple-plus-outline',
+            text: intl.formatMessage({id: 'mobile.invite_people.title', defaultMessage: 'Invite People'}),
             testID: 'plus_menu_item.invite_people_to_team',
         },
     };

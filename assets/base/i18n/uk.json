@@ -675,6 +675,7 @@
   "mobile.gallery.title": "{index} із {total}",
   "mobile.integration_selector.loading_channels": "Завантаження каналів...",
   "mobile.integration_selector.loading_options": "Завантаження параметрів...",
+  "mobile.invite_people.title": "Запросити людей",
   "mobile.ios.photos_permission_denied_description": "Завантажте фото та відео на сервер або збережіть їх на свій пристрій. Відкрийте налаштування, щоб надати {applicationName} доступ на читання та запис до вашої бібліотеки фото та відео.",
   "mobile.ios.photos_permission_denied_title": "{applicationName} хотіло б отримати доступ до ваших фотографій",
   "mobile.ios.plist.NSAppleMusicUsageDescription": "Увімкнення доступу до вашої медіатеки означає, що ви зможете прикріпляти ваші медіафайли до своїх повідомлень у {applicationName}.",

@@ -8,8 +8,9 @@ import {distinctUntilChanged, switchMap} from 'rxjs/operators';
 import {Permissions} from '@constants';
 import {observePermissionForTeam} from '@queries/servers/role';
 import {observeConfigBooleanValue, observePushVerificationStatus} from '@queries/servers/system';
-import {observeCurrentTeam} from '@queries/servers/team';
+import {observeCurrentTeam, observeMyTeamRoles} from '@queries/servers/team';
 import {observeCurrentUser} from '@queries/servers/user';
+import {isSystemAdmin} from '@utils/user';
 
 import ChannelListHeader from './header';
 
@@ -40,17 +41,25 @@ const enhanced = withObservables([], ({database}: WithDatabaseArgs) => {
         distinctUntilChanged(),
     );
 
-    const canAddUserToTeam = combineLatest([currentUser, team]).pipe(
-        switchMap(([u, t]) => observePermissionForTeam(database, t, u, Permissions.ADD_USER_TO_TEAM, false)),
+    const canInvitePeople = combineLatest([currentUser, team]).pipe(
+        switchMap(([u, t]) => {
+            if (!u || !t) {
+                return of$(false);
+            }
+            if (isSystemAdmin(u.roles)) {
+                return of$(true);
+            }
+            return observeMyTeamRoles(database, t.id).pipe(
+                switchMap((roles) => of$(Boolean(roles && roles.includes(Permissions.TEAM_ADMIN_ROLE)))),
+            );
+        }),
+        distinctUntilChanged(),
     );
 
     return {
         canCreateChannels,
         canJoinChannels,
-        canInvitePeople: combineLatest([enableOpenServer, canAddUserToTeam]).pipe(
-            switchMap(([openServer, addUser]) => of$(openServer && addUser)),
-            distinctUntilChanged(),
-        ),
+        canInvitePeople,
         displayName: team.pipe(
             switchMap((t) => of$(t?.displayName)),
             distinctUntilChanged(),

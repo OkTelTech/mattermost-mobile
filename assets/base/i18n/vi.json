@@ -561,6 +561,7 @@
   "mobile.gallery.title": "{index} / {total}",
   "mobile.integration_selector.loading_channels": "Đang tải kênh...",
   "mobile.integration_selector.loading_options": "Đang tải tùy chọn...",
+  "mobile.invite_people.title": "Mời mọi người",
   "mobile.ios.photos_permission_denied_description": "Tải ảnh và video lên phiên bản Mattermost của bạn hoặc lưu chúng vào thiết bị của bạn. Mở Cài đặt để cấp quyền truy cập Đọc và ghi vào thư viện ảnh và video của bạn cho Mattermost.",
   "mobile.ios.photos_permission_denied_title": "{applicationName} muốn truy cập ảnh của bạn",
   "mobile.ios.plist.NSAppleMusicUsageDescription": "Cho phép truy cập vào thư viện phương tiện của bạn có nghĩa là bạn có thể đính kèm tệp từ thư viện phương tiện vào thư của mình trong {applicationName}.",

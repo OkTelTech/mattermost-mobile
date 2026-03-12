@@ -5,6 +5,7 @@
 React Native 0.76.9 with **New Architecture disabled** (RCT_NEW_ARCH_ENABLED=0).
 
 ## Important Development Notes
+- **Read `rules.md` before implementing any new feature, UI change, or bug fix**
 - Always run the checks before committing code
 - Always test any changes using the mobile mcp before calling something complete or committing code
 - Never commit any planning markdown files
@@ -295,7 +296,7 @@ Located at `libraries/@mattermost/`:
 - Use named constants instead of magic numbers and check if one already exists.
 
 ### Localization (i18n)
-- **CRITICAL**: Only update `en.json` - never modify other language files or Weblate gets corrupted
+- **CRITICAL**: Every new string must be added to all 6 language files: `en.json`, `en_AU.json`, `vi.json`, `zh-CN.json`, `zh-TW.json`, `uk.json`. See `rules.md` section 10 for details.
 - Default messages in code must match JSON translations exactly, including newlines
 - Translation IDs should be descriptive enough for translators to understand context
 - Translate user-facing strings, not debug/error messages

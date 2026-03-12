@@ -626,6 +626,7 @@
   "mobile.gallery.title": "{index}/{total}",
   "mobile.integration_selector.loading_channels": "正在載入頻道…",
   "mobile.integration_selector.loading_options": "正在載入選項…",
+  "mobile.invite_people.title": "邀請成員",
   "mobile.ios.photos_permission_denied_description": "上傳圖片及影片至您的伺服器或儲存至您的裝置。開啟設定來准許 {applicationName} 取得您的圖片及影片庫的讀取與寫入權限。",
   "mobile.ios.photos_permission_denied_title": "{applicationName} 想要存取您的圖片",
   "mobile.ios.plist.NSAppleMusicUsageDescription": "啟用媒體庫存取即表示您可以在 {applicationName} 中為您的訊息夾帶媒體庫檔案。",

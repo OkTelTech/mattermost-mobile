@@ -713,6 +713,7 @@
   "mobile.gallery.title": "{index}/{total}",
   "mobile.integration_selector.loading_channels": "正在载入频道…",
   "mobile.integration_selector.loading_options": "正在载入选项…",
+  "mobile.invite_people.title": "邀请成员",
   "mobile.intune.login.canceled": "登录已取消。请重试",
   "mobile.intune.login.failed": "身份验证失败。请重试",
   "mobile.ios.photos_permission_denied_description": "拍照并上传到您的服务器或保存到您的设备。打开设定并允许 {applicationName} 读写到您的相册和视频集。",
