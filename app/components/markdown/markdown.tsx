@@ -670,7 +670,22 @@ const Markdown = ({
     const output = useMemo(() => {
         let ast;
         try {
-            ast = parser.parse(value.toString());
+            // Escape lone block markers that would otherwise render as empty blocks
+            const rawValue = value.toString()
+
+                // Bullet list markers: -, +, * alone on a line → empty bullet •
+                .replace(/^([-+*])(\s*)$/mg, '\\$1$2')
+
+                // Ordered list markers: 1. or 1) alone on a line → empty numbered item
+                .replace(/^(\d+)([.)])(\s*)$/mg, '$1\\$2$3')
+
+                // Blockquote marker: > alone on a line → empty blockquote
+                .replace(/^>(\s*)$/mg, '\\>$1')
+
+                // Heading markers: #, ##, ... ###### alone on a line → empty heading
+                .replace(/^(#{1,6})(\s*)$/mg, '\\$1$2');
+
+            ast = parser.parse(rawValue);
 
             ast = combineTextNodes(ast);
             ast = addListItemIndices(ast);
