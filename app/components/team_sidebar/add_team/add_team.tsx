@@ -9,12 +9,14 @@ import CompassIcon from '@components/compass_icon';
 import SlideUpPanelItem, {ITEM_HEIGHT} from '@components/slide_up_panel_item';
 import TouchableWithFeedback from '@components/touchable_with_feedback';
 import {Screens} from '@constants';
+import {useServerUrl} from '@context/server';
 import {useTheme} from '@context/theme';
 import {usePreventDoubleTap} from '@hooks/utils';
 import {TITLE_HEIGHT} from '@screens/bottom_sheet/content';
 import {bottomSheet, dismissBottomSheet, showModal} from '@screens/navigation';
 import {bottomSheetSnapPoint} from '@utils/helpers';
 import {changeOpacity, makeStyleSheetFromTheme} from '@utils/theme';
+import {tryOpenURL} from '@utils/url';
 
 type Props = {
     canCreateTeam: boolean;
@@ -46,6 +48,7 @@ export default function AddTeam({canCreateTeam}: Props) {
     const theme = useTheme();
     const styles = getStyleSheet(theme);
     const intl = useIntl();
+    const serverUrl = useServerUrl();
 
     const openJoinTeam = useCallback(() => {
         const title = intl.formatMessage({id: 'mobile.add_team.join_team', defaultMessage: 'Join Another Team'});
@@ -100,9 +103,18 @@ export default function AddTeam({canCreateTeam}: Props) {
                     testID='team_sidebar.add_team.create_team.option'
                     text={intl.formatMessage({id: 'mobile.create_team.title', defaultMessage: 'Create a Team'})}
                 />
+                <SlideUpPanelItem
+                    leftIcon='shield-outline'
+                    onPress={() => {
+                        dismissBottomSheet();
+                        tryOpenURL(`${serverUrl}/admin_console`);
+                    }}
+                    testID='team_sidebar.add_team.system_console.option'
+                    text={intl.formatMessage({id: 'mobile.add_team.system_console', defaultMessage: 'Go to System Console'})}
+                />
             </>
         );
-    }, [intl, openJoinTeam, openCreateTeam]);
+    }, [intl, openJoinTeam, openCreateTeam, serverUrl]);
 
     const onPress = usePreventDoubleTap(useCallback(() => {
         if (!canCreateTeam) {
@@ -113,7 +125,7 @@ export default function AddTeam({canCreateTeam}: Props) {
         bottomSheet({
             title: intl.formatMessage({id: 'mobile.add_team.title', defaultMessage: 'Add a Team'}),
             renderContent,
-            snapPoints: [1, bottomSheetSnapPoint(2, ITEM_HEIGHT) + TITLE_HEIGHT],
+            snapPoints: [1, bottomSheetSnapPoint(3, ITEM_HEIGHT) + TITLE_HEIGHT],
             theme,
             closeButtonId: 'close-add-team-bottom-sheet',
         });

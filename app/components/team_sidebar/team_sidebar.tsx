@@ -67,7 +67,7 @@ export default function TeamSidebar({iconPad, canJoinOtherTeams, canCreateTeam, 
             <Animated.View style={[styles.listContainer, serverStyle]}>
                 <TeamList testID='team_sidebar.team_list'/>
                 {(canJoinOtherTeams || canCreateTeam) && (
-                    <AddTeam/>
+                    <AddTeam canCreateTeam={canCreateTeam}/>
                 )}
             </Animated.View>
         </Animated.View>

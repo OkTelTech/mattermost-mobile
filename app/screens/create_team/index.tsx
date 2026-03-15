@@ -3,7 +3,7 @@
 
 import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {useIntl} from 'react-intl';
-import {ActivityIndicator, Keyboard, ScrollView, View} from 'react-native';
+import {ActivityIndicator, Keyboard, ScrollView, Text, View} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 
 import {createTeam, handleTeamChange, teamNameExists} from '@actions/remote/team';
@@ -17,6 +17,7 @@ import {usePreventDoubleTap} from '@hooks/utils';
 import {buildNavigationButton, dismissModal, setButtons} from '@screens/navigation';
 import {changeOpacity, makeStyleSheetFromTheme} from '@utils/theme';
 import {typography} from '@utils/typography';
+import {removeProtocol} from '@utils/url';
 
 import type {AvailableScreens} from '@typings/screens/navigation';
 
@@ -49,10 +50,15 @@ const getStyleSheet = makeStyleSheetFromTheme((theme: Theme) => ({
     inputContainer: {
         marginBottom: 16,
     },
-    hint: {
+    urlPreview: {
+        ...typography('Body', 75, 'Regular'),
         color: changeOpacity(theme.centerChannelColor, 0.56),
         marginTop: 8,
-        ...typography('Body', 75, 'Regular'),
+        marginHorizontal: 4,
+    },
+    urlPreviewHighlight: {
+        ...typography('Body', 75, 'SemiBold'),
+        color: theme.buttonBg,
     },
     loadingContainer: {
         flex: 1,
@@ -102,7 +108,7 @@ export default function CreateTeam({componentId, closeButtonId}: Props) {
             setButtons(componentId, {rightButtons: [btn]});
         } else {
             const enabled = !creating && teamUrl.length >= MIN_NAME_LENGTH && URL_REGEX.test(teamUrl);
-            const btn = buildRightButton(CREATE_BUTTON_ID, 'create_team.create.button', formatMessage({id: 'mobile.create_team.create', defaultMessage: 'Create Team'}), enabled);
+            const btn = buildRightButton(CREATE_BUTTON_ID, 'create_team.create.button', formatMessage({id: 'mobile.create_team.done', defaultMessage: 'Done'}), enabled);
             setButtons(componentId, {rightButtons: [btn]});
         }
     }, [step, teamName, teamUrl, creating, buildRightButton, componentId, formatMessage]);
@@ -230,6 +236,13 @@ export default function CreateTeam({componentId, closeButtonId}: Props) {
                             maxLength={MAX_NAME_LENGTH}
                             rawInput={true}
                         />
+                        <Text
+                            style={styles.urlPreview}
+                            testID='create_team.url.preview'
+                        >
+                            {removeProtocol(serverUrl)}{'/'}
+                            <Text style={styles.urlPreviewHighlight}>{teamUrl || '...'}</Text>
+                        </Text>
                     </View>
                 )}
             </ScrollView>
